@@ -10,3 +10,7 @@
 /bin/
 /tests/
 tags
+/.xml
+/modm_devices
+/modm-devices
+/tgcurses
