@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import argparse
 import curses
 import curses.ascii
@@ -39,8 +39,8 @@ RESISTORS = ['None', 'Pull-Up', 'Pull-Down']
 
 
 def draw_cpu(cpu_win, chip, cursor):
-    for x in xrange(chip.width):
-        for y in xrange(chip.height):
+    for x in range(chip.width):
+        for y in range(chip.height):
             p = chip.pin_map[x][y]
             if p is None:
                 continue
@@ -134,7 +134,7 @@ def draw_search_win(search_win):
 
 
 def update_regex(chip, r):
-    for p in chip.pins.itervalues():
+    for p in chip.pins.values():
         if r:
             config = 'Custom' if not p._default else 'Default'
             match  = r.search(p.name)
@@ -205,7 +205,7 @@ def main(screen, chip):
     alt_fn_len = 0
     add_fn_len = 0
     label_len  = 1
-    for p in chip.pins.itervalues():
+    for p in chip.pins.values():
         alt_fn_len = max(alt_fn_len, max(len(f) for f in p.alt_fns+['']))
         add_fn_len = max(add_fn_len, max(len(f) for f in p.add_fns+['']))
         label_len  = max(len(p.name) + 1, label_len)

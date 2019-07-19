@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import argparse
 import collections
 
@@ -243,9 +243,9 @@ class ChipPackage(object):
         self.height  = height
         self.pins    = pins
         self.pin_map = []
-        for _ in xrange(height):
+        for _ in range(height):
             self.pin_map.append([None]*self.width)
-        for k, p in pins.iteritems():
+        for k, p in pins.items():
             x, y = self._key_to_pos(k)
             self.pin_map[x][y] = p
 
@@ -274,7 +274,7 @@ class ChipPackage(object):
             mask_2[k]  = 0xFFFFFFFF
             mask_4[k]  = 0xFFFFFFFFFFFFFFFF
 
-        for p in self.pins.itervalues():
+        for p in self.pins.values():
             if p._default:
                 continue
             if not hasattr(p, '_gpio'):
@@ -426,7 +426,7 @@ class PinDB(object):
             for n, l in enumerate(f):
                 parts = l.strip().split(' ')
                 if len(parts) != 9:
-                    print 'Line %u: %u parts' % (n+1, len(parts))
+                    print('Line %u: %u parts' % (n+1, len(parts)))
                 rows.append(parts)
 
         for r in rows:
