@@ -1,0 +1,12 @@
+*.swp
+*.elf
+*.o
+*.d
+*.a
+*.map
+*.out
+*.pyc
+/build/
+/bin/
+/tests/
+tags
