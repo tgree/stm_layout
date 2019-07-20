@@ -2,8 +2,8 @@
 import argparse
 import collections
 
+import chip_package
 
-CHIP_PACAKGES = {}
 
 DEFAULT_MODER = {
     'PA' : 0xABFFFFFF,
@@ -193,67 +193,18 @@ class Pin(object):
             self._choices[3].val     = self._choices[3].default_val
 
 
-class ChipPackage(object):
-    class Cursor(object):
-        def __init__(self, cp):
-            self.chip = cp
-            self.pos  = (-1, 0)
-            self.right()
-
-        @property
-        def pin(self):
-            return self.chip.pin_map[self.pos[0]][self.pos[1]]
-
-        def left(self):
-            x = self.pos[0]
-            while x - 1 >= 0:
-                x -= 1
-                if self.chip.pin_map[x][self.pos[1]] != None:
-                    self.pos = (x, self.pos[1])
-                    return
-
-        def right(self):
-            x = self.pos[0]
-            while x + 1 < self.chip.width:
-                x += 1
-                if self.chip.pin_map[x][self.pos[1]] != None:
-                    self.pos = (x, self.pos[1])
-                    return
-
-        def up(self):
-            y = self.pos[1]
-            while y - 1 >= 0:
-                y -= 1
-                if self.chip.pin_map[self.pos[0]][y] != None:
-                    self.pos = (self.pos[0], y)
-                    return  
-
-        def down(self):
-            y = self.pos[1]
-            while y + 1 < self.chip.height:
-                y += 1
-                if self.chip.pin_map[self.pos[0]][y] != None:
-                    self.pos = (self.pos[0], y)
-                    return
-
-    def __init__(self, name, width, height, pins):
-        super(ChipPackage, self).__init__()
-        self.name    = name
-        self.width   = width
-        self.height  = height
+class Chip(object):
+    def __init__(self, chip_package, pins):
+        self.chip    = chip_package
+        self.width   = self.chip.width
+        self.height  = self.chip.height
         self.pins    = pins
-        self.pin_map = []
-        for _ in range(height):
-            self.pin_map.append([None]*self.width)
+        self.pin_map = self.chip.pins
         for k, p in pins.items():
-            x, y = self._key_to_pos(k)
-            self.pin_map[x][y] = p
-
-    def _make_cursor(self):
-        return ChipPackage.Cursor(self)
+            self.chip[k] = p
 
     def cursor(self):
-        return self._make_cursor()
+        return self.chip.cursor()
 
     def serialize_settings(self):
         moder     = {}
@@ -274,7 +225,7 @@ class ChipPackage(object):
             mask_2[k]  = 0xFFFFFFFF
             mask_4[k]  = 0xFFFFFFFFFFFFFFFF
 
-        for p in self.pins.values():
+        for p in self.chip.pins.values():
             if p._default:
                 continue
             if not hasattr(p, '_gpio'):
@@ -321,97 +272,19 @@ class ChipPackage(object):
         return s
 
 
-class LQFP100(ChipPackage):
-    class Cursor(ChipPackage.Cursor):
-        def left(self):
-            if self.pos[0] == 1:
-                if self.pos[1] == 0:
-                    self.pos = (0, 1)
-                else:
-                    self.pos = (0, self.chip.height - 2)
-            else:
-                super(LQFP100.Cursor, self).left()
-
-        def right(self):
-            if self.pos[0] == self.chip.width - 2:
-                if self.pos[1] == 0:
-                    self.pos = (self.pos[0] + 1, 1)
-                else:
-                    self.pos = (self.pos[0] + 1, self.chip.height - 2)
-            else:
-                super(LQFP100.Cursor, self).right()
-
-        def up(self):
-            if self.pos[1] == 1:
-                if self.pos[0] == 0:
-                    self.pos = (1, 0)
-                else:
-                    self.pos = (self.chip.width - 2, 0)
-            else:
-                super(LQFP100.Cursor, self).up()
-
-        def down(self):
-            if self.pos[1] == self.chip.height - 2:
-                if self.pos[0] == 0:
-                    self.pos = (1, self.pos[1] + 1)
-                else:
-                    self.pos = (self.chip.width - 2, self.pos[1] + 1)
-            else:
-                super(LQFP100.Cursor, self).down()
-
+class LQFP100(Chip):
     def __init__(self, pins):
-        super(LQFP100, self).__init__('lqfp100', 27, 27, pins)
-
-    def _key_to_pos(self, k):
-        k = int(k, 10)
-        assert k >= 1 and k <= 100
-        if 1 <= k and k <= 25:
-            return (0, k)
-        elif 26 <= k and k <= 50:
-            return (k - 25, 26)
-        elif 51 <= k and k <= 75:
-            return (26, 76 - k)
-        elif 76 <= k and k <= 100:
-            return (101 - k, 0)
-
-    def _make_cursor(self):
-        return LQFP100.Cursor(self)
+        super(LQFP100, self).__init__(chip_package.LQFP(25, 25), pins)
 
 
-class UFBGA176_25(ChipPackage):
+class UFBGA176_25(Chip):
     def __init__(self, pins):
-        super(UFBGA176_25, self).__init__('ufbga176+25', 15, 15, pins)
-
-    def _key_to_pos(self, k):
-        y = ord(k[0]) - ord('A')
-        if ord(k[0]) >= ord('Q'):
-            y -= 3
-        elif ord(k[0]) >= ord('O'):
-            y -= 2
-        elif ord(k[0]) >= ord('I'):
-            y -= 1
-        x = int(k[1:]) - 1
-        assert not (x < 0 or x >= self.width or y < 0 or y >= self.height)
-        return (x, y)
+        super(UFBGA176_25, self).__init__(chip_package.BGA(15, 15), pins)
 
 
-class TFBGA240_25(ChipPackage):
+class TFBGA240_25(Chip):
     def __init__(self, pins):
-        super(TFBGA240_25, self).__init__('tfbga240+25', 17, 17, pins)
-
-    def _key_to_pos(self, k):
-        y = ord(k[0]) - ord('A')
-        if ord(k[0]) >= ord('S'):
-            y -= 4
-        elif ord(k[0]) >= ord('Q'):
-            y -= 3
-        elif ord(k[0]) >= ord('O'):
-            y -= 2
-        elif ord(k[0]) >= ord('I'):
-            y -= 1
-        x = int(k[1:]) - 1
-        assert not (x < 0 or x >= self.width or y < 0 or y >= self.height)
-        return (x, y)
+        super(TFBGA240_25, self).__init__(chip_package.BGA(17, 17), pins)
 
 
 class PinDB(object):
