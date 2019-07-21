@@ -61,9 +61,9 @@ def draw_cpu(cpu_win, chip, cursor):
 def draw_info(info_win, pin):
     is_f = (FOCUS == FOCUS_INFO)
     info_win.content.erase()
-    attr = curses.color_pair(1) if REGEX and REGEX.search(pin.name) else 0
+    attr = curses.color_pair(1) if REGEX and REGEX.search(pin.full_name) else 0
     info_win.content.addstr(
-            '    Name: %-*s' % (info_win.content.width - 12, pin.name),
+            '    Name: %-*s' % (info_win.content.width - 12, pin.full_name),
             pos=(0,1), attr=attr)
     attr = curses.color_pair(1) if REGEX and REGEX.search(pin.key) else 0
     info_win.content.addstr(
@@ -205,10 +205,12 @@ def main(screen, chip):
     # Get the longest function names.
     alt_fn_len = 0
     add_fn_len = 0
+    name_len   = 15
     label_len  = 1
     for p in chip.pins.values():
         alt_fn_len = max(alt_fn_len, max(len(f) for f in p.alt_fns+['']))
         add_fn_len = max(add_fn_len, max(len(f) for f in p.add_fns+['']))
+        name_len   = max(len(p.full_name), name_len)
         label_len  = max(len(p.name) + 1, label_len)
         p._attr    = 0
 
@@ -242,7 +244,7 @@ def main(screen, chip):
             'Pin Info',
             left_anchor=ws.canvas.frame.left_anchor(),
             top_anchor=search_win.frame.bottom_anchor(),
-            width=29, height=18)
+            width=14+name_len, height=18)
 
     # Add an alternate functions window.
     alt_fns_win = ws.make_anchored_window(

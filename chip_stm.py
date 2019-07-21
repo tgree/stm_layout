@@ -15,14 +15,15 @@ class Choice(object):
 
 
 class Pin(object):
-    def __init__(self, name, key, alt_fns, add_fns):
+    def __init__(self, name, key, alt_fns, add_fns, full_name):
         super(Pin, self).__init__()
-        self.name     = name
-        self.key      = key
-        self._default = False
-        self._altfn   = None
-        self.alt_fns  = alt_fns
-        self.add_fns  = add_fns
+        self.name      = name
+        self.full_name = full_name
+        self.key       = key
+        self._default  = False
+        self._altfn    = None
+        self.alt_fns   = alt_fns
+        self.add_fns   = add_fns
 
         self._choices = []
         gpio = name[:2]
@@ -200,13 +201,16 @@ def make_chip(part):
     pkg     = chip_db.make_package(part)
     pin_map = {}
     for p in part.properties['pin']:
-        pin_map[p['name'].split('-')[0]] = p
+        name            = p['name'].split('-')[0]
+        name            = name.split(' ')[0]
+        prefix          = name.split('_')[0]
+        p['shortname']  = name
+        pin_map[p['position']] = p
 
     gpios = part.get_driver('gpio')
     pins  = {}
     for gpio in gpios['gpio']:
         name = 'P%c%u' % (gpio['port'].upper(), int(gpio['pin'], 10))
-        pin  = pin_map[name]
         alt_fns = ['-']*16
         add_fns = []
         for s in gpio['signal']:
@@ -221,11 +225,14 @@ def make_chip(part):
             else:
                 add_fns.append(f)
 
-        key  = pin['position']
-        pins[key] = Pin(pin['name'], key, alt_fns, add_fns)
+        key       = gpio['position']
+        pin       = pin_map[key]
+        name      = pin['shortname']
+        fname     = pin['name']
+        pins[key] = Pin(name, key, alt_fns, add_fns, fname)
 
     for p in part.properties['pin']:
         key = p['position']
         if key not in pins:
-            pins[key] = Pin(p['name'], key, [], [])
+            pins[key] = Pin(p['name'], key, [], [], p['name'])
     return Chip(pkg, pins)
