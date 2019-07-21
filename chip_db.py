@@ -58,7 +58,12 @@ def make_package(dev):
     p = package(dev)
     n = pin_count(dev)
     if p in ('TFBGA', 'UFBGA', 'WLCSP'):
-        dim = int(math.ceil(math.sqrt(float(n))))
+        if n == 240:
+            dim = 17    # 240+25
+        elif n == 176:
+            dim = 15    # 176+25
+        else:
+            dim = int(math.ceil(math.sqrt(float(n))))
         return chip_package.BGA(dim, dim)
     elif p in ('LQFP', 'UFQFPN'):
         dim = int(math.ceil(float(n)/4.))
