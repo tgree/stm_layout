@@ -13,6 +13,9 @@ class Choice(object):
         self.val         = val
         self.enabled     = [True for _ in choices]
 
+    def reset(self):
+        self.val = self.default_val
+
 
 class Pin(object):
     def __init__(self, name, key, alt_fns, add_fns, full_name):
@@ -20,7 +23,7 @@ class Pin(object):
         self.name      = name
         self.full_name = full_name
         self.key       = key
-        self._default  = False
+        self._default  = True
         self._altfn    = None
         self.alt_fns   = alt_fns
         self.add_fns   = add_fns
@@ -53,13 +56,13 @@ class GPIO(Pin):
     def _reset(self):
         self._default = True
         if hasattr(self, '_gpio'):
-            gpio                 = self._gpio
-            n                    = self._gpionum
-            self._choices[0].val = 0
-            self._choices[1].val = 0
-            self._choices[2].val = 0
-            self._choices[3].val = 0
-            self._altfn          = 0 if self._choices[0].val == 2 else None
+            gpio = self._gpio
+            n    = self._gpionum
+            self._choices[0].reset()
+            self._choices[1].reset()
+            self._choices[2].reset()
+            self._choices[3].reset()
+            self._altfn = 0 if self._choices[0].val == 2 else None
         self._update_choices()
 
     def _set_choice(self, n):
