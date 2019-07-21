@@ -222,7 +222,7 @@ def main(screen, chip):
     ws = tgcurses.ui.Workspace(screen)
 
     # Add a CPU window.
-    cpu_win            = ws.make_edge_window('STM32', w=label_len*w+3, h=h+2)
+    cpu_win            = ws.make_edge_window(chip.name, w=label_len*w+3, h=h+2)
     cpu_win._label_len = label_len
     cursor             = chip.cursor()
     cpu_win.content.timeout(100)

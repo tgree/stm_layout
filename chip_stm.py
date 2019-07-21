@@ -122,7 +122,8 @@ class GPIO(Pin):
 
 
 class Chip(object):
-    def __init__(self, chip_package, pins):
+    def __init__(self, name, chip_package, pins):
+        self.name    = name
         self.chip    = chip_package
         self.width   = self.chip.width
         self.height  = self.chip.height
@@ -238,4 +239,4 @@ def make_chip(part):
         key = p['position']
         if key not in pins:
             pins[key] = Pin(p['name'], key, [], [], p['name'])
-    return Chip(pkg, pins)
+    return Chip(str(part).upper(), pkg, pins)
