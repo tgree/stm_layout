@@ -24,27 +24,29 @@ class Pin(object):
         self._altfn    = None
         self.alt_fns   = alt_fns
         self.add_fns   = add_fns
-
         self._choices  = []
         self._nchoices = 0
+
+
+class GPIO(Pin):
+    def __init__(self, name, key, alt_fns, add_fns, full_name):
+        super(GPIO, self).__init__(name, key, alt_fns, add_fns, full_name)
         gpio = name[:2]
-        #if gpio in DEFAULT_MODER:
-        if False:
-            try:
-                n             = int(name[2:])
-                self._gpio    = gpio
-                self._gpionum = n
-                self._choices = [
-                    Choice('Mode', ['GPI', 'GPO', 'Alternate', 'Analog'], 0),
-                    Choice('Speed', ['Low', 'Med', 'High', 'Very High'], 0),
-                    Choice('Type', ['Push-Pull', 'Open-Drain'], 0),
-                    Choice('Resistor', ['None', 'Pull-Up', 'Pull-Down'], 0),
-                    ]
-                self._nchoices = sum(len(c.choices) for c in self._choices)
-                if self._choices[0].val == 2:
-                    self._altfn = 0
-            except ValueError:
-                pass
+        try:
+            n             = int(name[2:])
+            self._gpio    = gpio
+            self._gpionum = n
+            self._choices = [
+                Choice('Mode', ['GPI', 'GPO', 'Alternate', 'Analog'], 0),
+                Choice('Speed', ['Low', 'Med', 'High', 'Very High'], 0),
+                Choice('Type', ['Push-Pull', 'Open-Drain'], 0),
+                Choice('Resistor', ['None', 'Pull-Up', 'Pull-Down'], 0),
+                ]
+            self._nchoices = sum(len(c.choices) for c in self._choices)
+            if self._choices[0].val == 2:
+                self._altfn = 0
+        except ValueError:
+            pass
 
         self._reset()
 
@@ -53,10 +55,10 @@ class Pin(object):
         if hasattr(self, '_gpio'):
             gpio                 = self._gpio
             n                    = self._gpionum
-            self._choices[0].val = (DEFAULT_MODER[gpio] >> (2*n)) & 0x3
-            self._choices[1].val = (DEFAULT_OSPEEDR[gpio] >> (2*n)) & 0x3
-            self._choices[2].val = (DEFAULT_OTYPER[gpio] >> n) & 1
-            self._choices[3].val = (DEFAULT_PUPDR[gpio] >> (2*n)) & 0x3
+            self._choices[0].val = 0
+            self._choices[1].val = 0
+            self._choices[2].val = 0
+            self._choices[3].val = 0
             self._altfn          = 0 if self._choices[0].val == 2 else None
         self._update_choices()
 
@@ -230,7 +232,7 @@ def make_chip(part):
         pin       = pin_map[key]
         name      = pin['shortname']
         fname     = pin['name']
-        pins[key] = Pin(name, key, alt_fns, add_fns, fname)
+        pins[key] = GPIO(name, key, alt_fns, add_fns, fname)
 
     for p in part.properties['pin']:
         key = p['position']
