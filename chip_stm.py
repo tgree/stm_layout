@@ -25,7 +25,8 @@ class Pin(object):
         self.alt_fns   = alt_fns
         self.add_fns   = add_fns
 
-        self._choices = []
+        self._choices  = []
+        self._nchoices = 0
         gpio = name[:2]
         #if gpio in DEFAULT_MODER:
         if False:

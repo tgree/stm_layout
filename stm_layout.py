@@ -285,9 +285,21 @@ def main(screen, chip):
         elif c == ord('\t'):
             set_focus((FOCUS + 1) % FOCUS_N, cpu_win, info_win, alt_fns_win,
                       add_fns_win, search_win, chip, cursor)
+            if FOCUS == FOCUS_INFO and cursor.pin._nchoices == 0:
+                set_focus((FOCUS + 1) % FOCUS_N, cpu_win, info_win, alt_fns_win,
+                          add_fns_win, search_win, chip, cursor)
+            if FOCUS == FOCUS_ALTFNS and not cursor.pin.alt_fns:
+                set_focus((FOCUS + 1) % FOCUS_N, cpu_win, info_win, alt_fns_win,
+                          add_fns_win, search_win, chip, cursor)
         elif c == curses.KEY_BTAB:
             set_focus((FOCUS - 1) % FOCUS_N, cpu_win, info_win, alt_fns_win,
                       add_fns_win, search_win, chip, cursor)
+            if FOCUS == FOCUS_ALTFNS and not cursor.pin.alt_fns:
+                set_focus((FOCUS - 1) % FOCUS_N, cpu_win, info_win, alt_fns_win,
+                          add_fns_win, search_win, chip, cursor)
+            if FOCUS == FOCUS_INFO and cursor.pin._nchoices == 0:
+                set_focus((FOCUS - 1) % FOCUS_N, cpu_win, info_win, alt_fns_win,
+                          add_fns_win, search_win, chip, cursor)
         elif FOCUS == FOCUS_CHIP:
             if c in (ord('j'), curses.KEY_DOWN):
                 cursor.down()
