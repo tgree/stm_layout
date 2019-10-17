@@ -138,7 +138,7 @@ def update_regex(chip, r):
     for p in chip.pins.values():
         if r:
             config = 'Custom' if not p._default else 'Default'
-            match  = r.search(p.name)
+            match  = r.search(p.full_name)
             match  = match or r.search(config)
             match  = match or r.search(p.key)
             match  = match or any(r.search(f) for f in p.alt_fns)

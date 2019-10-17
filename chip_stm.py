@@ -32,18 +32,20 @@ class Pin(object):
 
 
 class GPIO(Pin):
-    def __init__(self, name, key, alt_fns, add_fns, full_name):
+    def __init__(self, name, key, alt_fns, add_fns, full_name, part):
         super(GPIO, self).__init__(name, key, alt_fns, add_fns, full_name)
         gpio = name[:2]
         try:
-            n             = int(name[2:])
-            self._gpio    = gpio
-            self._gpionum = n
+            n                             = int(name[2:])
+            moder, otyper, ospeedr, pupdr = chip_db.get_gpio_defaults(part,
+                                                                      gpio, n)
+            self._gpio                    = gpio
+            self._gpionum                 = n
             self._choices = [
-                Choice('Mode', ['GPI', 'GPO', 'Alternate', 'Analog'], 0),
-                Choice('Speed', ['Low', 'Med', 'High', 'Very High'], 0),
-                Choice('Type', ['Push-Pull', 'Open-Drain'], 0),
-                Choice('Resistor', ['None', 'Pull-Up', 'Pull-Down'], 0),
+                Choice('Mode', ['GPI', 'GPO', 'Alternate', 'Analog'], moder),
+                Choice('Speed', ['Low', 'Med', 'High', 'Very High'], ospeedr),
+                Choice('Type', ['Push-Pull', 'Open-Drain'], otyper),
+                Choice('Resistor', ['None', 'Pull-Up', 'Pull-Down'], pupdr),
                 ]
             self._nchoices = sum(len(c.choices) for c in self._choices)
             if self._choices[0].val == 2:
@@ -57,7 +59,6 @@ class GPIO(Pin):
         self._default = True
         if hasattr(self, '_gpio'):
             gpio = self._gpio
-            n    = self._gpionum
             self._choices[0].reset()
             self._choices[1].reset()
             self._choices[2].reset()
@@ -125,8 +126,9 @@ class GPIO(Pin):
 
 
 class Chip(object):
-    def __init__(self, name, chip_package, pins):
-        self.name    = name
+    def __init__(self, part, chip_package, pins):
+        self.name    = str(part).upper()
+        self.part    = part
         self.chip    = chip_package
         self.width   = self.chip.width
         self.height  = self.chip.height
@@ -147,7 +149,8 @@ class Chip(object):
         mask_1    = {}
         mask_2    = {}
         mask_4    = {}
-        for k in DEFAULT_MODER.iterkeys():
+        keys      = chip_db.get_gpio_ports(self.part)
+        for k in keys:
             moder[k]   = 0x00000000
             otyper[k]  = 0x00000000
             ospeedr[k] = 0x00000000
@@ -157,7 +160,7 @@ class Chip(object):
             mask_2[k]  = 0xFFFFFFFF
             mask_4[k]  = 0xFFFFFFFFFFFFFFFF
 
-        for p in self.chip.pins.values():
+        for p in self.pins.values():
             if p._default:
                 continue
             if not hasattr(p, '_gpio'):
@@ -176,9 +179,7 @@ class Chip(object):
                 altfnr[port] |= (p._altfn << 4*n)
 
         s     = ''
-        ports = ['PA', 'PB', 'PC', 'PD', 'PE', 'PF',
-                 'PG', 'PH', 'PI', 'PJ', 'PK']
-        for port in ports:
+        for port in keys:
             if mask_2[port] == 0xFFFFFFFF:
                 continue
             s += '%s.MODER   = (%s.MODER   & 0x%08X) | 0x%08X\n' % (
@@ -236,10 +237,10 @@ def make_chip(part):
         pin       = pin_map[key]
         name      = pin['shortname']
         fname     = pin['name']
-        pins[key] = GPIO(name, key, alt_fns, add_fns, fname)
+        pins[key] = GPIO(name, key, alt_fns, add_fns, fname, part)
 
     for p in part.properties['pin']:
         key = p['position']
         if key not in pins:
             pins[key] = Pin(p['name'], key, [], [], p['name'])
-    return Chip(str(part).upper(), pkg, pins)
+    return Chip(part, pkg, pins)

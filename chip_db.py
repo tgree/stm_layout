@@ -1,6 +1,7 @@
 import modm_devices.parser
 import glob
 import math
+import re
 
 import chip_package
 
@@ -34,6 +35,7 @@ def pin_count(dev):
     return {'a' : 169,
             'b' : 208,
             'c' : 48,
+            'k' : 32,
             'i' : 176,
             'm' : 80.5,
             'q' : 100,
@@ -72,7 +74,7 @@ def make_package(dev):
 
 
 GPIO_DEFAULTS = {
-    'RM0433' : {
+    'RM0433' : {    # STM32H742/743/750/753
         'MODER' : {
             'PA' : 0xABFFFFFF,
             'PB' : 0xFFFFFEBF,
@@ -125,18 +127,43 @@ GPIO_DEFAULTS = {
             'PJ' : 0x00000000,
             'PK' : 0x00000000,
         },
-        'AFR' : {
-            'PA' : 0x0000000000000000,
-            'PB' : 0x0000000000000000,
-            'PC' : 0x0000000000000000,
-            'PD' : 0x0000000000000000,
-            'PE' : 0x0000000000000000,
-            'PF' : 0x0000000000000000,
-            'PG' : 0x0000000000000000,
-            'PH' : 0x0000000000000000,
-            'PI' : 0x0000000000000000,
-            'PJ' : 0x0000000000000000,
-            'PK' : 0x0000000000000000,
+    },
+    'RM0440' : {    # STM32G4
+        'MODER' : {
+            'PA' : 0xABFFFFFF,
+            'PB' : 0xFFFFFEBF,
+            'PC' : 0xFFFFFFFF,
+            'PD' : 0xFFFFFFFF,
+            'PE' : 0xFFFFFFFF,
+            'PF' : 0xFFFFFFFF,
+            'PG' : 0xFFFFFFFF,
+        },
+        'OTYPER' : {
+            'PA' : 0x00000000,
+            'PB' : 0x00000000,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PE' : 0x00000000,
+            'PF' : 0x00000000,
+            'PG' : 0x00000000,
+        },
+        'OSPEEDR' : {
+            'PA' : 0x0C000000,
+            'PB' : 0x00000000,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PE' : 0x00000000,
+            'PF' : 0x00000000,
+            'PG' : 0x00000000,
+        },
+        'PUPDR' : {
+            'PA' : 0x64000000,
+            'PB' : 0x00000100,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PE' : 0x00000000,
+            'PF' : 0x00000000,
+            'PG' : 0x00000000,
         },
     },
 }
@@ -146,21 +173,31 @@ REFM_TABLE = {
     '^stm32h743.*' : 'RM0433',
     '^stm32h753.*' : 'RM0433',
     '^stm32h750.*' : 'RM0433',
+    '^stm32g4.*'   : 'RM0440',
 }
 
-def get_gpio_defaults(identifier, port, pin):
-    refm = None
+
+def get_refm(part):
+    identifier = str(part.identifier)
     for k, v in REFM_TABLE.items():
         regex = re.compile(k)
         if regex.search(identifier):
-            refm = v
-            break
-    if not refm:
-        raise KeyError
+            return v
+    raise KeyError
 
-    defs    = GPIO_DEFAULTS[refm]
+
+def get_gpio_ports(part):
+    return GPIO_DEFAULTS[get_refm(part)]['MODER'].keys()
+
+
+def get_gpio_defaults(part, port, pin):
+    defs    = GPIO_DEFAULTS[get_refm(part)]
     moder   = defs['MODER'][port]
     otyper  = defs['OTYPER'][port]
     ospeedr = defs['OSPEEDR'][port]
     pupdr   = defs['PUPDR'][port]
-    afr     = defs['AFR'][port]
+    return ((moder >> (2*pin)) & 0x3,
+            (otyper >> pin) & 0x1,
+            (ospeedr >> (2*pin)) & 0x3,
+            (pupdr >> (2*pin)) & 0x3,
+            )
