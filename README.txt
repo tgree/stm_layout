@@ -1,5 +1,12 @@
 Python curses-based tool for configuring STM32 pins.
 
+This tool uses a fork of the amazing curated .xml from the modm-devices
+project.  The modm-devices project provides metadata about all STM32 devices
+in machine-parseable .xml format and is really what makes any tool like this
+one possible.
+
+Building: Just type 'make'.
+
 Usage: ./stm_layout -c <chip_name>
 
 If chip_name is not fully-specified (i.e. 'stm32g474' is only a partial chip
