@@ -1,0 +1,19 @@
+Python curses-based tool for configuring STM32 pins.
+
+Usage: ./stm_layout -c <chip_name>
+
+If chip_name is not fully-specified (i.e. 'stm32g474' is only a partial chip
+name), then a list of available chips matching that part will be printed to
+stdout.  If the chip name is fully specified, (i.e. 'stm32g474cet'), then a
+text UI will be brought up for browsing/searching pins and configuring them.
+
+Navigate using the arrow keys and the tab key.  Search using standard regex
+queries in the search bar.  In any pane but the search pane:
+
+    q - quits
+    w - writes /tmp/stm32_pinout.txt
+    r - resets the current pin
+
+The stm32_pinout.txt is an attempt to configure all the GPIO registers for
+your chip; it is woefully incomplete for anything except the H7 and G4 chips
+I have access to.
