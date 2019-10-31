@@ -17,7 +17,7 @@ modm-devices:
 	@touch .xml
 
 
-modm_devices: .xml
+modm_devices: modm-devices
 	@ln -s modm-devices/tools/device/modm_devices
 
 
