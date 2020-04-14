@@ -74,7 +74,61 @@ def make_package(dev):
 
 
 GPIO_DEFAULTS = {
-    'RM0433' : {    # STM32H742/743/750/753
+    'RM0399' : {    # STM32H745/747/755/757 (same defaults as RM0433)
+        'MODER' : {
+            'PA' : 0xABFFFFFF,
+            'PB' : 0xFFFFFEBF,
+            'PC' : 0xFFFFFFFF,
+            'PD' : 0xFFFFFFFF,
+            'PE' : 0xFFFFFFFF,
+            'PF' : 0xFFFFFFFF,
+            'PG' : 0xFFFFFFFF,
+            'PH' : 0xFFFFFFFF,
+            'PI' : 0xFFFFFFFF,
+            'PJ' : 0xFFFFFFFF,
+            'PK' : 0xFFFFFFFF,
+        },
+        'OTYPER' : {
+            'PA' : 0x00000000,
+            'PB' : 0x00000000,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PE' : 0x00000000,
+            'PF' : 0x00000000,
+            'PG' : 0x00000000,
+            'PH' : 0x00000000,
+            'PI' : 0x00000000,
+            'PJ' : 0x00000000,
+            'PK' : 0x00000000,
+        },
+        'OSPEEDR' : {
+            'PA' : 0x0C000000,
+            'PB' : 0x000000C0,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PE' : 0x00000000,
+            'PF' : 0x00000000,
+            'PG' : 0x00000000,
+            'PH' : 0x00000000,
+            'PI' : 0x00000000,
+            'PJ' : 0x00000000,
+            'PK' : 0x00000000,
+        },
+        'PUPDR' : {
+            'PA' : 0x64000000,
+            'PB' : 0x00000100,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PE' : 0x00000000,
+            'PF' : 0x00000000,
+            'PG' : 0x00000000,
+            'PH' : 0x00000000,
+            'PI' : 0x00000000,
+            'PJ' : 0x00000000,
+            'PK' : 0x00000000,
+        },
+    },
+    'RM0433' : {    # STM32H742/743/750/753 (same defaults as RM0399)
         'MODER' : {
             'PA' : 0xABFFFFFF,
             'PB' : 0xFFFFFEBF,
@@ -171,8 +225,12 @@ GPIO_DEFAULTS = {
 REFM_TABLE = {
     '^stm32h742.*' : 'RM0433',
     '^stm32h743.*' : 'RM0433',
-    '^stm32h753.*' : 'RM0433',
+    '^stm32h745.*' : 'RM0399',
+    '^stm32h747.*' : 'RM0399',
     '^stm32h750.*' : 'RM0433',
+    '^stm32h753.*' : 'RM0433',
+    '^stm32h755.*' : 'RM0399',
+    '^stm32h757.*' : 'RM0399',
     '^stm32g4.*'   : 'RM0440',
 }
 
