@@ -235,7 +235,7 @@ def main(screen, chip):
             left_anchor=cpu_win.frame.left_anchor(),
             top_anchor=cpu_win.frame.bottom_anchor(),
             right_anchor=cpu_win.frame.right_anchor(),
-            height=3)
+            h=3)
     search_win.content.timeout(100)
     search_win.content.keypad(1)
 
@@ -244,14 +244,14 @@ def main(screen, chip):
             'Pin Info',
             left_anchor=ws.canvas.frame.left_anchor(),
             top_anchor=search_win.frame.bottom_anchor(),
-            width=14+name_len, height=18)
+            w=14+name_len, h=18)
 
     # Add an alternate functions window.
     alt_fns_win = ws.make_anchored_window(
             'Alternate Functions',
             left_anchor=info_win.frame.right_anchor(),
             top_anchor=search_win.frame.bottom_anchor(),
-            width=alt_fn_len+12, height=18)
+            w=alt_fn_len+12, h=18)
 
     # Add an additional functions window.
     add_fns_win = ws.make_anchored_window(
@@ -259,7 +259,7 @@ def main(screen, chip):
             left_anchor=alt_fns_win.frame.right_anchor(),
             top_anchor=search_win.frame.bottom_anchor(),
             bottom_anchor=alt_fns_win.frame.bottom_anchor(),
-            width=add_fn_len+4)
+            w=add_fn_len+4)
 
     # Handle user input.
     update_ui(cpu_win, info_win, alt_fns_win, add_fns_win, search_win, chip,
