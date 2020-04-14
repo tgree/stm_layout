@@ -32,18 +32,22 @@ def find(name):
 
 
 def pin_count(dev):
-    return {'a' : 169,
-            'b' : 208,
-            'c' : 48,
-            'k' : 32,
-            'i' : 176,
-            'm' : 80.5,
-            'q' : 100,
-            'r' : 64,
-            'v' : 100,
-            'x' : 240,
-            'z' : 144,
-            }[dev.identifier.pin]
+    # Unfortunately, sometimes R means 64 and sometimes it means 68.  So, we
+    # just count the pins.  For some reason, counting the pins goes slower.
+    # Maybe modm-devices does some deferred loading?
+    return len(dev.properties['pin'])
+    #return {'a' : 169,
+    #        'b' : 208,
+    #        'c' : 48,
+    #        'k' : 32,
+    #        'i' : 176,
+    #        'm' : 80.5,
+    #        'q' : 100,
+    #        'r' : 64,
+    #        'v' : 100,
+    #        'x' : 240,
+    #        'z' : 144,
+    #        }[dev.identifier.pin]
 
 
 def package(dev):
@@ -52,6 +56,7 @@ def package(dev):
             'k' : 'UFBGA',  # 0.65 mm
             't' : 'LQFP',
             'u' : 'UFQFPN',
+            'v' : 'VFQFPN',
             'y' : 'WLCSP',
             }[dev.identifier.package]
 
@@ -67,7 +72,7 @@ def make_package(dev):
         else:
             dim = int(math.ceil(math.sqrt(float(n))))
         return chip_package.BGA(dim, dim)
-    elif p in ('LQFP', 'UFQFPN'):
+    elif p in ('LQFP', 'UFQFPN', 'VFQFPN'):
         dim = int(math.ceil(float(n)/4.))
         return chip_package.LQFP(dim, dim)
     raise KeyError
