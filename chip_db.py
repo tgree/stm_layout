@@ -290,13 +290,16 @@ def get_gpio_ports(part):
 
 
 def get_gpio_defaults(part, port, pin):
-    defs    = GPIO_DEFAULTS[get_refm(part)]
-    moder   = defs['MODER'][port]
-    otyper  = defs['OTYPER'][port]
-    ospeedr = defs['OSPEEDR'][port]
-    pupdr   = defs['PUPDR'][port]
-    return ((moder >> (2*pin)) & 0x3,
-            (otyper >> pin) & 0x1,
-            (ospeedr >> (2*pin)) & 0x3,
-            (pupdr >> (2*pin)) & 0x3,
-            )
+    try:
+        defs    = GPIO_DEFAULTS[get_refm(part)]
+        moder   = defs['MODER'][port]
+        otyper  = defs['OTYPER'][port]
+        ospeedr = defs['OSPEEDR'][port]
+        pupdr   = defs['PUPDR'][port]
+        return ((moder >> (2*pin)) & 0x3,
+                (otyper >> pin) & 0x1,
+                (ospeedr >> (2*pin)) & 0x3,
+                (pupdr >> (2*pin)) & 0x3,
+                )
+    except KeyError:
+        return (0, 0, 0, 0)
