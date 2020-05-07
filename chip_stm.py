@@ -221,7 +221,7 @@ def make_chip(part):
         name = 'P%c%u' % (gpio['port'].upper(), int(gpio['pin'], 10))
         alt_fns = ['-']*16
         add_fns = []
-        for s in gpio['signal']:
+        for s in gpio.get('signal', []):
             f = (s.get('driver', '').upper() + s.get('instance', '') +
                  '_' + s['name'].upper())
             if 'af' in s:
