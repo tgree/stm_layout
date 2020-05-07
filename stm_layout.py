@@ -203,8 +203,8 @@ def main(screen, chip):
     w, h = chip.width, chip.height
 
     # Get the longest function names.
-    alt_fn_len = 0
-    add_fn_len = 0
+    alt_fn_len = 24
+    add_fn_len = 24
     name_len   = 15
     label_len  = 1
     for p in chip.pins.values():
