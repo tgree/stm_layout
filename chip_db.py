@@ -54,6 +54,7 @@ def package(dev):
     return {'h' : 'TFBGA',
             'i' : 'UFBGA',  # 0.5 mm
             'k' : 'UFBGA',  # 0.65 mm
+            'q' : 'UFBGA',
             't' : 'LQFP',
             'u' : 'UFQFPN',
             'v' : 'VFQFPN',
