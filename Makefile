@@ -7,7 +7,7 @@ tgcurses:
 
 
 modm-devices:
-	@git clone https://github.com/tgree/modm-devices
+	@git clone -b develop_with_gpio_xml https://github.com/tgree/modm-devices
 
 
 .xml: modm-devices
