@@ -1,5 +1,9 @@
 .PHONY: all
-all: modm_devices
+all: tgcurses modm_devices
+
+
+tgcurses:
+	@git clone https://github.com/tgree/tgcurses
 
 
 modm-devices:
@@ -18,4 +22,4 @@ modm_devices: modm-devices
 
 
 clean:
-	@rm -rf modm-devices .xml 2>/dev/null or true
+	@rm -rf tgcurses modm-devices .xml 2>/dev/null or true
