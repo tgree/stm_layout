@@ -3,7 +3,8 @@ all: tgcurses modm_devices
 
 
 tgcurses:
-	@git clone https://github.com/tgree/tgcurses
+	@git clone https://github.com/tgree/tgcurses tgcurses.git
+	@ln -s tgcurses.git/tgcurses
 
 
 modm-devices:
