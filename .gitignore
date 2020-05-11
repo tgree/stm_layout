@@ -13,4 +13,4 @@ tags
 /.xml
 /modm_devices
 /modm-devices
-/tgcurses
+/tgcurses*
