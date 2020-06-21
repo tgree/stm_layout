@@ -35,7 +35,7 @@ def pin_count(dev):
     # Unfortunately, sometimes R means 64 and sometimes it means 68.  So, we
     # just count the pins.  For some reason, counting the pins goes slower.
     # Maybe modm-devices does some deferred loading?
-    return len(dev.properties['pin'])
+    return len(set(p['position'] for p in dev.properties['pin']))
     #return {'a' : 169,
     #        'b' : 208,
     #        'c' : 48,

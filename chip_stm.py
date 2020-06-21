@@ -233,6 +233,15 @@ def make_chip(part):
             else:
                 add_fns.append(f)
 
+        # TODO: Some small devices have multiplexed pins where the SYSCFG
+        #       device can be used to select if the physical pin should be PA0
+        #       or PA1 or...  This is different from a normal pin which is
+        #       usually always just PA0 and then you select the alternate or
+        #       analog function for that pin - i.e. it's another level of
+        #       multiplexing to squash more functionality into a small pin
+        #       count.  For these types of devices, there will be multiple
+        #       GPIOs that have the same 'position' field and when we populate
+        #       pins[key] we will only hold the last one there.
         key       = gpio['position']
         pin       = pin_map[key]
         name      = pin['shortname']
