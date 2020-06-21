@@ -51,21 +51,31 @@ def pin_count(dev):
 
 
 def package(dev):
-    return {'h' : 'TFBGA',
-            'i' : 'UFBGA',  # 0.5 mm
-            'k' : 'UFBGA',  # 0.65 mm
-            'q' : 'UFBGA',
-            't' : 'LQFP',
-            'u' : 'UFQFPN',
-            'v' : 'VFQFPN',
-            'y' : 'WLCSP',
-            }[dev.identifier.package]
+    try:
+        return {'e' : 'EWLCSP',
+                'f' : 'WLCSP',
+                'h' : 'TFBGA',
+                'i' : 'UFBGA',  # 0.5 mm
+                'j' : 'UFBGA',
+                'k' : 'UFBGA',  # 0.65 mm
+                'm' : 'SO8N',
+                'p' : 'TSSOP',
+                'q' : 'UFBGA',
+                't' : 'LQFP',
+                'u' : 'UFQFPN',
+                'v' : 'VFQFPN',
+                'y' : 'WLCSP',
+                }[dev.identifier.package]
+    except:
+        pass
+    raise Exception("Device %s has unknown package '%s'."
+                    % (dev, dev.identifier.package))
 
 
 def make_package(dev):
     p = package(dev)
     n = pin_count(dev)
-    if p in ('TFBGA', 'UFBGA', 'WLCSP'):
+    if p in ('TFBGA', 'UFBGA', 'WLCSP', 'EWLCSP'):
         if n == 240:
             dim = 17    # 240+25
         elif n == 176:
@@ -76,6 +86,9 @@ def make_package(dev):
     elif p in ('LQFP', 'UFQFPN', 'VFQFPN'):
         dim = int(math.ceil(float(n)/4.))
         return chip_package.LQFP(dim, dim)
+    elif p in ('TSSOP', 'SO8N'):
+        dim = int(math.ceil(float(n)/2.))
+        return chip_package.TSSOP(dim)
     raise KeyError
 
 
