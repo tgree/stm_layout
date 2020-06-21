@@ -8,8 +8,8 @@ class Package(object):
         self.width  = width
         self.height = height
         self.pins   = []
-        for _ in range(height):
-            self.pins.append([None]*self.width)
+        for _ in range(width):
+            self.pins.append([None]*self.height)
 
 
 class BGA(Package):
