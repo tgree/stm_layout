@@ -8,8 +8,8 @@ class Package(object):
         self.width  = width
         self.height = height
         self.pins   = []
-        for _ in range(height):
-            self.pins.append([None]*self.width)
+        for _ in range(width):
+            self.pins.append([None]*self.height)
 
 
 class BGA(Package):
@@ -158,3 +158,59 @@ class LQFP(Package):
 
     def cursor(self):
         return LQFP.Cursor(self)
+
+
+class TSSOP(Package):
+    class Cursor(object):
+        def __init__(self, chip):
+            self.chip = chip
+            self.pos = (-1, 0)
+            self.right()
+
+        @property
+        def pin(self):
+            return self.chip.pins[self.pos[0]][self.pos[1]]
+
+        def move(self, delta):
+            new_pos = self.pos
+            while True:
+                new_pos = (new_pos[0] + delta[0], new_pos[1] + delta[1])
+                if new_pos[0] < 0 or new_pos[0] >= 2:
+                    return
+                if new_pos[1] < 0 or new_pos[1] >= self.chip.height:
+                    return
+                if self.chip.pins[new_pos[0]][new_pos[1]] == None:
+                    continue
+
+                self.pos = new_pos
+                return
+
+        def left(self):
+            self.move((-1, 0))
+
+        def right(self):
+            self.move((1, 0))
+
+        def up(self):
+            self.move((0, -1))
+
+        def down(self):
+            self.move((0, 1))
+
+    def __init__(self, height):
+        super(TSSOP, self).__init__(2, height)
+
+    def __getitem__(self, key):
+        key = int(key, 10) - 1
+        x   = key // self.height
+        y   = key % self.height
+        return self.pins[x][y]
+
+    def __setitem__(self, key, val):
+        key = int(key, 10) - 1
+        x   = key // self.height
+        y   = key % self.height
+        self.pins[x][y] = val
+
+    def cursor(self):
+        return TSSOP.Cursor(self)
