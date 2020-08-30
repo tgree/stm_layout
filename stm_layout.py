@@ -360,9 +360,10 @@ if __name__ == '__main__':
     rv = parser.parse_args()
 
     parts = chip_db.find(rv.chip)
-    if len(parts) > 1:
+    part = next( (p for p in parts if rv.chip == p.partname), None)
+    if part is None:
         for p in parts:
-            print('%s - %s%s' % (p, chip_db.package(p), chip_db.pin_count(p)))
+            print('%s - %s' % (p, chip_db.package(p)))
     else:
         chip = chip_stm.make_chip(parts[0])
         tgcurses.wrapper(main, chip)

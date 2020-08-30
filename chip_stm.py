@@ -165,7 +165,7 @@ class Chip(object):
                 continue
             if not hasattr(p, '_gpio'):
                 continue
-            
+
             port           = p._gpio
             n              = p._gpionum
             mask_1[port]  &= ~(0x1 <<   n)
@@ -207,15 +207,24 @@ class Chip(object):
 
 def make_chip(part):
     pkg     = chip_db.make_package(part)
-    pin_map = {}
-    for p in part.properties['pin']:
-        name            = p['name'].split('-')[0]
-        name            = name.split(' ')[0]
-        prefix          = name.split('_')[0]
-        p['shortname']  = name
-        pin_map[p['position']] = p
 
     gpios = part.get_driver('gpio')
+    pinout = []
+    for pin in gpios["package"][0]["pin"]:
+        name = shortname = pin["name"]
+        ptype = pin.get("type", "i/o").upper()
+        if "I/O" in ptype:
+            shortname = name[:4]
+            if len(shortname) > 3 and not shortname[3].isdigit():
+                shortname = shortname[:3]
+        pinout.append({
+            "short": shortname,
+            "position": pin["position"],
+            "name": pin["name"],
+            "type": ptype,
+            "remap": pin.get("variant", "") == "remap",
+        })
+
     pins  = {}
     for gpio in gpios['gpio']:
         name = 'P%c%u' % (gpio['port'].upper(), int(gpio['pin'], 10))
@@ -239,17 +248,15 @@ def make_chip(part):
         #       usually always just PA0 and then you select the alternate or
         #       analog function for that pin - i.e. it's another level of
         #       multiplexing to squash more functionality into a small pin
-        #       count.  For these types of devices, there will be multiple
-        #       GPIOs that have the same 'position' field and when we populate
-        #       pins[key] we will only hold the last one there.
-        key       = gpio['position']
-        pin       = pin_map[key]
-        name      = pin['shortname']
-        fname     = pin['name']
-        pins[key] = GPIO(name, key, alt_fns, add_fns, fname, part)
+        #       count.  For these types of devices, there will only show the
+        #       default configuration, i.e. the non-remapped pin.
+        pin = next(p for p in pinout if p["short"] == name)
+        if not pin["remap"]:
+            key = pin['position']
+            pins[key] = GPIO(name, key, alt_fns, add_fns, pin['name'], part)
 
-    for p in part.properties['pin']:
-        key = p['position']
+    for pin in pinout:
+        key = pin['position']
         if key not in pins:
-            pins[key] = Pin(p['name'], key, [], [], p['name'])
+            pins[key] = Pin(pin["short"], key, [], [], pin['name'])
     return Chip(part, pkg, pins)
