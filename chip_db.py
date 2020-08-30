@@ -34,38 +34,13 @@ def find(name):
 def pin_count(dev):
     # Unfortunately, sometimes R means 64 and sometimes it means 68.  So, we
     # just count the pins.  For some reason, counting the pins goes slower.
-    # Maybe modm-devices does some deferred loading?
-    return len(set(p['position'] for p in dev.properties['pin']))
-    #return {'a' : 169,
-    #        'b' : 208,
-    #        'c' : 48,
-    #        'k' : 32,
-    #        'i' : 176,
-    #        'm' : 80.5,
-    #        'q' : 100,
-    #        'r' : 64,
-    #        'v' : 100,
-    #        'x' : 240,
-    #        'z' : 144,
-    #        }[dev.identifier.pin]
+    # Maybe modm-devices does some deferred loading? Yes it does. -Niklas
+    return len(set(p['position'] for p in dev.get_driver("gpio")["package"][0]["pin"]))
 
 
 def package(dev):
     try:
-        return {'e' : 'EWLCSP',
-                'f' : 'WLCSP',
-                'h' : 'TFBGA',
-                'i' : 'UFBGA',  # 0.5 mm
-                'j' : 'UFBGA',
-                'k' : 'UFBGA',  # 0.65 mm
-                'm' : 'SO8N',
-                'p' : 'TSSOP',
-                'q' : 'UFBGA',
-                't' : 'LQFP',
-                'u' : 'UFQFPN',
-                'v' : 'VFQFPN',
-                'y' : 'WLCSP',
-                }[dev.identifier.package]
+        return dev.get_driver("gpio")["package"][0]["name"]
     except:
         pass
     raise Exception("Device %s has unknown package '%s'."
@@ -75,7 +50,7 @@ def package(dev):
 def make_package(dev):
     p = package(dev)
     n = pin_count(dev)
-    if p in ('TFBGA', 'UFBGA', 'WLCSP', 'EWLCSP'):
+    if any(name in p for name in ('TFBGA', 'UFBGA', 'WLCSP', 'EWLCSP')):
         if n == 240:
             dim = 17    # 240+25
         elif n == 176:
@@ -83,10 +58,10 @@ def make_package(dev):
         else:
             dim = int(math.ceil(math.sqrt(float(n))))
         return chip_package.BGA(dim, dim)
-    elif p in ('LQFP', 'UFQFPN', 'VFQFPN'):
+    elif any(name in p for name in ('LQFP', 'UFQFPN', 'VFQFPN')):
         dim = int(math.ceil(float(n)/4.))
         return chip_package.LQFP(dim, dim)
-    elif p in ('TSSOP', 'SO8N'):
+    elif any(name in p for name in ('TSSOP', 'SO8N')):
         dim = int(math.ceil(float(n)/2.))
         return chip_package.TSSOP(dim)
     raise KeyError

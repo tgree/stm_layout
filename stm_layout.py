@@ -362,7 +362,7 @@ if __name__ == '__main__':
     parts = chip_db.find(rv.chip)
     if len(parts) > 1:
         for p in parts:
-            print('%s - %s%s' % (p, chip_db.package(p), chip_db.pin_count(p)))
+            print('%s - %s' % (p, chip_db.package(p)))
     else:
         chip = chip_stm.make_chip(parts[0])
         tgcurses.wrapper(main, chip)

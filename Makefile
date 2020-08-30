@@ -8,7 +8,7 @@ tgcurses:
 
 
 modm-devices:
-	@git clone -b develop_with_gpio_xml https://github.com/tgree/modm-devices
+	@git clone -b feature/pinout https://github.com/salkinium/modm-devices
 
 
 .xml: modm-devices
@@ -19,7 +19,7 @@ modm-devices:
 
 
 modm_devices: modm-devices
-	@ln -s modm-devices/tools/device/modm_devices
+	@ln -s modm-devices/modm_devices
 
 
 clean:
