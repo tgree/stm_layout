@@ -201,7 +201,7 @@ GPIO_DEFAULTS = {
             'PK' : 0x00000000,
         },
     },
-    'RM0444' : {    # STM32G0
+    'RM0444_RM0454' : {    # STM32G0
         'MODER' : {
             'PA' : 0xEBFFFFFF,
             'PB' : 0xFFFFFFFF,
@@ -314,7 +314,7 @@ REFM_TABLE = {
     '^stm32h753.*' : 'RM0433',
     '^stm32h755.*' : 'RM0399',
     '^stm32h757.*' : 'RM0399',
-    '^stm32g0.*'   : 'RM0444',
+    '^stm32g0.*'   : 'RM0444_RM0454',
     '^stm32g4.*'   : 'RM0440',
     '^stm32wb55.*' : 'RM0434',
 }
