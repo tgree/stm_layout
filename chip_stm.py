@@ -206,28 +206,52 @@ class Chip(object):
 
 
 def make_chip(part):
-    pkg     = chip_db.make_package(part)
+    gpio_driver = part.get_driver('gpio')
 
-    gpios = part.get_driver('gpio')
-    pinout = []
-    for pin in gpios["package"][0]["pin"]:
-        name = shortname = pin["name"]
-        ptype = pin.get("type", "i/o").upper()
-        if "I/O" in ptype:
-            shortname = name[:4]
-            if len(shortname) > 3 and not shortname[3].isdigit():
-                shortname = shortname[:3]
-        pinout.append({
-            "short": shortname,
-            "position": pin["position"],
-            "name": pin["name"],
-            "type": ptype,
-            "remap": pin.get("variant", "") == "remap",
-        })
+    gpios = {}
+    for gpio in gpio_driver['gpio']:
+        gpios['P%s%s' % (gpio['port'].upper(), gpio['pin'])] = gpio
 
-    pins  = {}
-    for gpio in gpios['gpio']:
-        name = 'P%c%u' % (gpio['port'].upper(), int(gpio['pin'], 10))
+    pins = {}
+    for p in gpio_driver['package'][0]['pin']:
+        # TODO: Some small devices have multiplexed pins where the SYSCFG
+        #       device can be used to select if the physical pin should be PA0
+        #       or PA1 or...  This is different from a normal pin which is
+        #       usually always just PA0 and then you select the alternate or
+        #       analog function for that pin - i.e. it's another level of
+        #       multiplexing to squash more functionality into a small pin
+        #       count.  For these types of devices, we will only show the
+        #       default configuration, i.e. the non-remapped pin.
+        if p.get('variant', '') == 'remap':
+            continue
+
+        full_name = p['name']
+        key       = p['position']
+
+        # GPIO pins don't have a type and non-GPIOs have nothing to extract,
+        # so assign them directly.
+        if 'type' in p:
+            pins[key] = Pin(full_name, key, [], [], full_name)
+            continue
+
+        # Extract the short name and the GPIO key from the full name.  Sample
+        # full names:
+        #
+        #   PA0
+        #   PA11 [PA9]
+        #   PC14-OSC32_IN (PC14)
+        #   PC2_C
+        #
+        # The short name is the initial prefix except in the case of an "_C"
+        # suffix, in which case the short name includes the suffix.  The GPIO
+        # key is always strictly the prefix.
+        short_name = full_name.split('-')[0]
+        short_name = short_name.split(' ')[0]
+        gpio_key   = short_name.split('_')[0]
+
+        # Extract the alternate (digital) functions and additional (analog)
+        # functions.
+        gpio    = gpios[gpio_key]
         alt_fns = ['-']*16
         add_fns = []
         for s in gpio.get('signal', []):
@@ -242,20 +266,8 @@ def make_chip(part):
             else:
                 add_fns.append(f)
 
-        # TODO: Some small devices have multiplexed pins where the SYSCFG
-        #       device can be used to select if the physical pin should be PA0
-        #       or PA1 or...  This is different from a normal pin which is
-        #       usually always just PA0 and then you select the alternate or
-        #       analog function for that pin - i.e. it's another level of
-        #       multiplexing to squash more functionality into a small pin
-        #       count.  For these types of devices, there will only show the
-        #       default configuration, i.e. the non-remapped pin.
-        pin = next(p for p in pinout if p["short"] == name and not p["remap"])
-        key = pin['position']
-        pins[key] = GPIO(name, key, alt_fns, add_fns, pin['name'], part)
+        # Assign the final pin.
+        pins[key] = GPIO(short_name, key, alt_fns, add_fns, full_name, part)
 
-    for pin in pinout:
-        key = pin['position']
-        if key not in pins:
-            pins[key] = Pin(pin["short"], key, [], [], pin['name'])
+    pkg = chip_db.make_package(part)
     return Chip(part, pkg, pins)
