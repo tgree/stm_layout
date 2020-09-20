@@ -183,6 +183,36 @@ GPIO_DEFAULTS = {
             'PK' : 0x00000000,
         },
     },
+    'RM0444_RM0454' : {    # STM32G0
+        'MODER' : {
+            'PA' : 0xEBFFFFFF,
+            'PB' : 0xFFFFFFFF,
+            'PC' : 0xFFFFFFFF,
+            'PD' : 0xFFFFFFFF,
+            'PF' : 0xFFFFFFFF,
+        },
+        'OTYPER' : {
+            'PA' : 0x00000000,
+            'PB' : 0x00000000,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PF' : 0x00000000,
+        },
+        'OSPEEDR' : {
+            'PA' : 0x0C000000,
+            'PB' : 0x00000000,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PF' : 0x00000000,
+        },
+        'PUPDR' : {
+            'PA' : 0x24000000,
+            'PB' : 0x00000000,
+            'PC' : 0x00000000,
+            'PD' : 0x00000000,
+            'PF' : 0x00000000,
+        },
+    },
     'RM0440' : {    # STM32G4
         'MODER' : {
             'PA' : 0xABFFFFFF,
@@ -266,6 +296,7 @@ REFM_TABLE = {
     '^stm32h753.*' : 'RM0433',
     '^stm32h755.*' : 'RM0399',
     '^stm32h757.*' : 'RM0399',
+    '^stm32g0.*'   : 'RM0444_RM0454',
     '^stm32g4.*'   : 'RM0440',
     '^stm32wb55.*' : 'RM0434',
 }
