@@ -165,7 +165,7 @@ class Chip(object):
                 continue
             if not hasattr(p, '_gpio'):
                 continue
-            
+
             port           = p._gpio
             n              = p._gpionum
             mask_1[port]  &= ~(0x1 <<   n)
@@ -206,19 +206,52 @@ class Chip(object):
 
 
 def make_chip(part):
-    pkg     = chip_db.make_package(part)
-    pin_map = {}
-    for p in part.properties['pin']:
-        name            = p['name'].split('-')[0]
-        name            = name.split(' ')[0]
-        prefix          = name.split('_')[0]
-        p['shortname']  = name
-        pin_map[p['position']] = p
+    gpio_driver = part.get_driver('gpio')
 
-    gpios = part.get_driver('gpio')
-    pins  = {}
-    for gpio in gpios['gpio']:
-        name = 'P%c%u' % (gpio['port'].upper(), int(gpio['pin'], 10))
+    gpios = {}
+    for gpio in gpio_driver['gpio']:
+        gpios['P%s%s' % (gpio['port'].upper(), gpio['pin'])] = gpio
+
+    pins = {}
+    for p in gpio_driver['package'][0]['pin']:
+        # TODO: Some small devices have multiplexed pins where the SYSCFG
+        #       device can be used to select if the physical pin should be PA0
+        #       or PA1 or...  This is different from a normal pin which is
+        #       usually always just PA0 and then you select the alternate or
+        #       analog function for that pin - i.e. it's another level of
+        #       multiplexing to squash more functionality into a small pin
+        #       count.  For these types of devices, we will only show the
+        #       default configuration, i.e. the non-remapped pin.
+        if p.get('variant', '') == 'remap':
+            continue
+
+        full_name = p['name']
+        key       = p['position']
+
+        # GPIO pins don't have a type and non-GPIOs have nothing to extract,
+        # so assign them directly.
+        if 'type' in p:
+            pins[key] = Pin(full_name, key, [], [], full_name)
+            continue
+
+        # Extract the short name and the GPIO key from the full name.  Sample
+        # full names:
+        #
+        #   PA0
+        #   PA11 [PA9]
+        #   PC14-OSC32_IN (PC14)
+        #   PC2_C
+        #
+        # The short name is the initial prefix except in the case of an "_C"
+        # suffix, in which case the short name includes the suffix.  The GPIO
+        # key is always strictly the prefix.
+        short_name = full_name.split('-')[0]
+        short_name = short_name.split(' ')[0]
+        gpio_key   = short_name.split('_')[0]
+
+        # Extract the alternate (digital) functions and additional (analog)
+        # functions.
+        gpio    = gpios[gpio_key]
         alt_fns = ['-']*16
         add_fns = []
         for s in gpio.get('signal', []):
@@ -233,23 +266,8 @@ def make_chip(part):
             else:
                 add_fns.append(f)
 
-        # TODO: Some small devices have multiplexed pins where the SYSCFG
-        #       device can be used to select if the physical pin should be PA0
-        #       or PA1 or...  This is different from a normal pin which is
-        #       usually always just PA0 and then you select the alternate or
-        #       analog function for that pin - i.e. it's another level of
-        #       multiplexing to squash more functionality into a small pin
-        #       count.  For these types of devices, there will be multiple
-        #       GPIOs that have the same 'position' field and when we populate
-        #       pins[key] we will only hold the last one there.
-        key       = gpio['position']
-        pin       = pin_map[key]
-        name      = pin['shortname']
-        fname     = pin['name']
-        pins[key] = GPIO(name, key, alt_fns, add_fns, fname, part)
+        # Assign the final pin.
+        pins[key] = GPIO(short_name, key, alt_fns, add_fns, full_name, part)
 
-    for p in part.properties['pin']:
-        key = p['position']
-        if key not in pins:
-            pins[key] = Pin(p['name'], key, [], [], p['name'])
+    pkg = chip_db.make_package(part)
     return Chip(part, pkg, pins)
