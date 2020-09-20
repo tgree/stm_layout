@@ -1,0 +1,17 @@
+[MESSAGES CONTROL]
+disable=bad-whitespace,
+        missing-module-docstring,
+        invalid-name,
+        missing-function-docstring,
+        too-many-arguments,
+        missing-class-docstring,
+        too-few-public-methods,
+        too-many-instance-attributes,
+        too-many-locals,
+        too-many-statements,
+        too-many-branches,
+        protected-access,
+        fixme,
+        global-statement,
+        broad-except,
+        useless-super-delegation

@@ -1,9 +1,11 @@
-import modm_devices.parser
 import glob
 import math
 import re
 
-import chip_package
+import modm_devices.parser
+import modm_devices.pkg
+
+from . import chip_package
 
 
 DEVICES = None
@@ -12,7 +14,8 @@ DEVICES = None
 def _populate_devices():
     global DEVICES
     DEVICES = {}
-    for filename in glob.glob('modm-devices/devices/**/*.xml'):
+    basedir = modm_devices.pkg.get_filename('modm_devices', 'resources/devices')
+    for filename in glob.glob('%s/**/*.xml' % basedir):
         parser  = modm_devices.parser.DeviceParser()
         devfile = parser.parse(filename)
         for device in devfile.get_devices():
@@ -35,15 +38,16 @@ def pin_count(dev):
     # Unfortunately, sometimes R means 64 and sometimes it means 68.  So, we
     # just count the pins.  For some reason, counting the pins goes slower.
     # Maybe modm-devices does some deferred loading? Yes it does. -Niklas
-    return len(set(p['position'] for p in dev.get_driver("gpio")["package"][0]["pin"]))
+    return len(set(p['position']
+                   for p in dev.get_driver('gpio')['package'][0]['pin']))
 
 
 def package(dev):
     try:
-        return dev.get_driver("gpio")["package"][0]["name"]
-    except:
+        return dev.get_driver('gpio')['package'][0]['name']
+    except Exception:
         pass
-    raise Exception("Device %s has unknown package '%s'."
+    raise Exception('Device %s has unknown package "%s".'
                     % (dev, dev.identifier.package))
 
 
@@ -58,12 +62,15 @@ def make_package(dev):
         else:
             dim = int(math.ceil(math.sqrt(float(n))))
         return chip_package.BGA(dim, dim)
-    elif any(name in p for name in ('LQFP', 'UFQFPN', 'VFQFPN')):
+
+    if any(name in p for name in ('LQFP', 'UFQFPN', 'VFQFPN')):
         dim = int(math.ceil(float(n)/4.))
         return chip_package.LQFP(dim, dim)
-    elif any(name in p for name in ('TSSOP', 'SO8N')):
+
+    if any(name in p for name in ('TSSOP', 'SO8N')):
         dim = int(math.ceil(float(n)/2.))
         return chip_package.TSSOP(dim)
+
     raise KeyError
 
 

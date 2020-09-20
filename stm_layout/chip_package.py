@@ -1,9 +1,9 @@
 
 BGA_Y_TO_LABEL = 'ABCDEFGHJKLMNPRTUVWY'
-BGA_LABEL_TO_Y = {label:i for i, label in enumerate(BGA_Y_TO_LABEL)}
+BGA_LABEL_TO_Y = {label: i for i, label in enumerate(BGA_Y_TO_LABEL)}
 
 
-class Package(object):
+class Package:
     def __init__(self, width, height):
         self.width  = width
         self.height = height
@@ -13,7 +13,7 @@ class Package(object):
 
 
 class BGA(Package):
-    class Cursor(object):
+    class Cursor:
         def __init__(self, chip):
             self.chip = chip
             self.pos = (-1, 0)
@@ -31,7 +31,7 @@ class BGA(Package):
                     return
                 if new_pos[1] < 0 or new_pos[1] >= self.chip.height:
                     return
-                if self.chip.pins[new_pos[0]][new_pos[1]] == None:
+                if self.chip.pins[new_pos[0]][new_pos[1]] is None:
                     continue
 
                 self.pos = new_pos
@@ -67,7 +67,7 @@ class BGA(Package):
 
 
 class LQFP(Package):
-    class Cursor(object):
+    class Cursor:
         def __init__(self, chip):
             self.chip = chip
             self.pos  = (0, 1)
@@ -110,7 +110,7 @@ class LQFP(Package):
                     self.pos = (self.chip.width - 1, self.pos[1] + delta)
                 if self.pos[1] == self.chip.height - 1:
                     self.pos = (self.pos[0] - delta, self.chip.height - 1)
-                if self.pin != None:
+                if self.pin is not None:
                     return
 
         def clockwise(self):
@@ -124,34 +124,34 @@ class LQFP(Package):
 
     def __getitem__(self, key):
         key = int(key, 10) - 1
-        if 0 <= key and key < self.height - 2:
+        if 0 <= key < self.height - 2:
             return self.pins[0][key]
         key -= self.height - 2
-        if 0 <= key and key < self.width - 2:
+        if 0 <= key < self.width - 2:
             return self.pins[key][self.height - 1]
         key -= self.width - 2
-        if 0 <= key and key < self.height - 2:
+        if 0 <= key < self.height - 2:
             return self.pins[self.width - 1][self.height - 1 - key - 1]
         key -= self.height - 2
-        if 0 <= key and key < self.width - 2:
+        if 0 <= key < self.width - 2:
             return self.pins[self.width - 1 - key - 1][0]
         raise KeyError
 
     def __setitem__(self, key, val):
         key = int(key, 10) - 1
-        if 0 <= key and key < self.height - 2:
+        if 0 <= key < self.height - 2:
             self.pins[0][key + 1] = val
             return
         key -= self.height - 2
-        if 0 <= key and key < self.width - 2:
+        if 0 <= key < self.width - 2:
             self.pins[key + 1][self.height - 1] = val
             return
         key -= self.width - 2
-        if 0 <= key and key < self.height - 2:
+        if 0 <= key < self.height - 2:
             self.pins[self.width - 1][self.height - 1 - key - 1] = val
             return
         key -= self.height - 2
-        if 0 <= key and key < self.width - 2:
+        if 0 <= key < self.width - 2:
             self.pins[self.width - 1 - key - 1][0] = val
             return
         raise KeyError
@@ -161,7 +161,7 @@ class LQFP(Package):
 
 
 class TSSOP(Package):
-    class Cursor(object):
+    class Cursor:
         def __init__(self, chip):
             self.chip = chip
             self.pos = (-1, 0)
@@ -179,7 +179,7 @@ class TSSOP(Package):
                     return
                 if new_pos[1] < 0 or new_pos[1] >= self.chip.height:
                     return
-                if self.chip.pins[new_pos[0]][new_pos[1]] == None:
+                if self.chip.pins[new_pos[0]][new_pos[1]] is None:
                     continue
 
                 self.pos = new_pos
