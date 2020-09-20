@@ -4,10 +4,10 @@ import curses
 import curses.ascii
 import re
 
-import chip_db
-import chip_stm
 import tgcurses
 import tgcurses.ui
+
+from stm_layout import chip_db, chip_stm
 
 
 # Errors in documentation:
@@ -63,17 +63,17 @@ def draw_info(info_win, pin):
     info_win.content.erase()
     attr = curses.color_pair(1) if REGEX and REGEX.search(pin.full_name) else 0
     info_win.content.addstr(
-            '    Name: %-*s' % (info_win.content.width - 12, pin.full_name),
-            pos=(0,1), attr=attr)
+        '    Name: %-*s' % (info_win.content.width - 12, pin.full_name),
+        pos=(0, 1), attr=attr)
     attr = curses.color_pair(1) if REGEX and REGEX.search(pin.key) else 0
     info_win.content.addstr(
-            '     Pos: %-*s' % (info_win.content.width - 12, pin.key),
-            pos=(1,1), attr=attr)
+        '     Pos: %-*s' % (info_win.content.width - 12, pin.key),
+        pos=(1, 1), attr=attr)
     config = 'Custom' if not pin._default else 'Default'
     attr = curses.color_pair(1) if REGEX and REGEX.search(config) else 0
     info_win.content.addstr(
-            '  Config: %-*s' % (info_win.content.width - 12, config),
-            pos=(2,1), attr=attr)
+        '  Config: %-*s' % (info_win.content.width - 12, config),
+        pos=(2, 1), attr=attr)
     y = 0
     for c in pin._choices:
         pattr = (curses.color_pair(1)
@@ -113,7 +113,7 @@ def draw_alt_fns(alt_fns_win, alt_fns, pin_altfn):
             attr |= curses.A_BOLD
         alt_fns_win.content.addstr(
             '[%c] %2u: %-*s' % (check, i, alt_fns_win.content.width - 10, f),
-            pos=(i,1), attr=attr)
+            pos=(i, 1), attr=attr)
     alt_fns_win.content.noutrefresh()
 
 
@@ -122,7 +122,7 @@ def draw_add_fns(add_fns_win, add_fns):
     for i, f in enumerate(add_fns):
         attr = curses.color_pair(1) if REGEX and REGEX.search(f) else 0
         add_fns_win.content.addstr('%-*s' % (add_fns_win.content.width - 2, f),
-                                   pos=(i,1), attr=attr)
+                                   pos=(i, 1), attr=attr)
     add_fns_win.content.noutrefresh()
 
 
@@ -198,6 +198,7 @@ def main(screen, chip):
     global REGEX_POS
     global ALTFNS_POS
     global INFO_POS
+    global FOCUS_WIN
 
     # Get the geometry.
     w, h = chip.width, chip.height
@@ -231,35 +232,35 @@ def main(screen, chip):
 
     # Add a search window.
     search_win = ws.make_anchored_window(
-            'Regex',
-            left_anchor=cpu_win.frame.left_anchor(),
-            top_anchor=cpu_win.frame.bottom_anchor(),
-            right_anchor=cpu_win.frame.right_anchor(),
-            h=3)
+        'Regex',
+        left_anchor=cpu_win.frame.left_anchor(),
+        top_anchor=cpu_win.frame.bottom_anchor(),
+        right_anchor=cpu_win.frame.right_anchor(),
+        h=3)
     search_win.content.timeout(100)
     search_win.content.keypad(1)
 
     # Add an info window.
     info_win = ws.make_anchored_window(
-            'Pin Info',
-            left_anchor=ws.canvas.frame.left_anchor(),
-            top_anchor=search_win.frame.bottom_anchor(),
-            w=14+name_len, h=18)
+        'Pin Info',
+        left_anchor=ws.canvas.frame.left_anchor(),
+        top_anchor=search_win.frame.bottom_anchor(),
+        w=14+name_len, h=18)
 
     # Add an alternate functions window.
     alt_fns_win = ws.make_anchored_window(
-            'Alternate Functions',
-            left_anchor=info_win.frame.right_anchor(),
-            top_anchor=search_win.frame.bottom_anchor(),
-            w=alt_fn_len+12, h=18)
+        'Alternate Functions',
+        left_anchor=info_win.frame.right_anchor(),
+        top_anchor=search_win.frame.bottom_anchor(),
+        w=alt_fn_len+12, h=18)
 
     # Add an additional functions window.
     add_fns_win = ws.make_anchored_window(
-            'Additional Functions',
-            left_anchor=alt_fns_win.frame.right_anchor(),
-            top_anchor=search_win.frame.bottom_anchor(),
-            bottom_anchor=alt_fns_win.frame.bottom_anchor(),
-            w=add_fn_len+4)
+        'Additional Functions',
+        left_anchor=alt_fns_win.frame.right_anchor(),
+        top_anchor=search_win.frame.bottom_anchor(),
+        bottom_anchor=alt_fns_win.frame.bottom_anchor(),
+        w=add_fn_len+4)
 
     # Handle user input.
     update_ui(cpu_win, info_win, alt_fns_win, add_fns_win, search_win, chip,
@@ -267,13 +268,14 @@ def main(screen, chip):
     tgcurses.ui.curs_set(0)
     while True:
         tgcurses.ui.doupdate()
-        c = FOCUS_WIN.content.getch()
+        c = cpu_win.content.getch()
         if c == -1:
             continue
 
         if FOCUS != FOCUS_SEARCH and c == ord('q'):
             break
-        elif FOCUS != FOCUS_SEARCH and c == ord('/'):
+
+        if FOCUS != FOCUS_SEARCH and c == ord('/'):
             set_focus(FOCUS_SEARCH, cpu_win, info_win, alt_fns_win,
                       add_fns_win, search_win, chip, cursor)
         elif FOCUS != FOCUS_SEARCH and c == ord('w'):
@@ -317,7 +319,7 @@ def main(screen, chip):
                     REGEX_POS -= 1
                     try:
                         REGEX = re.compile(REGEX_STR) if REGEX_STR else None
-                    except:
+                    except Exception:
                         REGEX = None
             elif c == curses.KEY_LEFT:
                 REGEX_POS = max(REGEX_POS - 1, 0)
@@ -333,7 +335,7 @@ def main(screen, chip):
                     REGEX_POS += 1
                     try:
                         REGEX = re.compile(REGEX_STR)
-                    except:
+                    except Exception:
                         REGEX = None
         elif FOCUS == FOCUS_INFO:
             if c in (ord('j'), curses.KEY_DOWN):
@@ -354,7 +356,7 @@ def main(screen, chip):
                   cursor)
 
 
-if __name__ == '__main__':
+def _main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--chip', '-c', required=True)
     rv = parser.parse_args()
@@ -366,3 +368,7 @@ if __name__ == '__main__':
     else:
         chip = chip_stm.make_chip(parts[0])
         tgcurses.wrapper(main, chip)
+
+
+if __name__ == '__main__':
+    _main()

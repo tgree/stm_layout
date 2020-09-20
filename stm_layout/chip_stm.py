@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-import argparse
-import collections
-
-import chip_db
+from . import chip_db
 
 
-class Choice(object):
+class Choice:
     def __init__(self, name, choices, val):
         self.name        = name
         self.choices     = choices
@@ -17,7 +14,7 @@ class Choice(object):
         self.val = self.default_val
 
 
-class Pin(object):
+class Pin:
     def __init__(self, name, key, alt_fns, add_fns, full_name):
         super(Pin, self).__init__()
         self.name      = name
@@ -58,7 +55,6 @@ class GPIO(Pin):
     def _reset(self):
         self._default = True
         if hasattr(self, '_gpio'):
-            gpio = self._gpio
             self._choices[0].reset()
             self._choices[1].reset()
             self._choices[2].reset()
@@ -125,7 +121,7 @@ class GPIO(Pin):
             self._choices[3].val     = self._choices[3].default_val
 
 
-class Chip(object):
+class Chip:
     def __init__(self, part, chip_package, pins):
         self.name    = str(part).upper()
         self.part    = part
@@ -183,25 +179,25 @@ class Chip(object):
             if mask_2[port] == 0xFFFFFFFF:
                 continue
             s += '%s.MODER   = (%s.MODER   & 0x%08X) | 0x%08X\n' % (
-                    port, port, mask_2[port], moder[port])
+                port, port, mask_2[port], moder[port])
             s += '%s.OTYPER  = (%s.OTYPER  & 0x%08X) | 0x%08X\n' % (
-                    port, port, mask_1[port], otyper[port])
+                port, port, mask_1[port], otyper[port])
             s += '%s.OSPEEDR = (%s.OSPEEDR & 0x%08X) | 0x%08X\n' % (
-                    port, port, mask_2[port], ospeedr[port])
+                port, port, mask_2[port], ospeedr[port])
             s += '%s.PUPDR   = (%s.PUPDR   & 0x%08X) | 0x%08X\n' % (
-                    port, port, mask_2[port], pupdr[port])
+                port, port, mask_2[port], pupdr[port])
             m = (mask_4[port] >> 0) & 0xFFFFFFFF
             if m != 0xFFFFFFFF:
                 s += '%s.AFRL    = (%s.AFRL    & 0x%08X) | 0x%08X\n' % (
-                        port, port,
-                        (mask_4[port] >>  0) & 0xFFFFFFFF,
-                        (altfnr[port] >>  0) & 0xFFFFFFFF)
+                    port, port,
+                    (mask_4[port] >>  0) & 0xFFFFFFFF,
+                    (altfnr[port] >>  0) & 0xFFFFFFFF)
             m = (mask_4[port] >> 32) & 0xFFFFFFFF
             if m != 0xFFFFFFFF:
                 s += '%s.AFRH    = (%s.AFRH    & 0x%08X) | 0x%08X\n' % (
-                        port, port,
-                        (mask_4[port] >> 32) & 0xFFFFFFFF,
-                        (altfnr[port] >> 32) & 0xFFFFFFFF)
+                    port, port,
+                    (mask_4[port] >> 32) & 0xFFFFFFFF,
+                    (altfnr[port] >> 32) & 0xFFFFFFFF)
         return s
 
 
