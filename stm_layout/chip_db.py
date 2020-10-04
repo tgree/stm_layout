@@ -11,11 +11,12 @@ from . import chip_package
 DEVICES = None
 
 
-def _populate_devices():
+def _populate_devices(prefix=None):
     global DEVICES
     DEVICES = {}
     basedir = modm_devices.pkg.get_filename('modm_devices', 'resources/devices')
-    for filename in glob.glob('%s/**/*.xml' % basedir):
+    if prefix is None: prefix = "";
+    for filename in glob.glob('{}/**/{}*.xml'.format(basedir, prefix)):
         parser  = modm_devices.parser.DeviceParser()
         devfile = parser.parse(filename)
         for device in devfile.get_devices():
@@ -24,7 +25,7 @@ def _populate_devices():
 
 def find(name):
     if DEVICES is None:
-        _populate_devices()
+        _populate_devices(name[:7])
 
     devs = []
     for partname, dev in DEVICES.items():
