@@ -362,11 +362,17 @@ def _main():
     rv = parser.parse_args()
 
     parts = chip_db.find(rv.chip)
-    if len(parts) > 1:
+    if not parts:
+        print('No devices found for "%s"' % rv.chip)
+        exit(1)
+    part = next( (p for p in parts if rv.chip == p.partname), None)
+    if part is None:
+        print('Multiple devices found for "%s"' % rv.chip)
         for p in parts:
             print('%s - %s' % (p, chip_db.package(p)))
+        exit(1)
     else:
-        chip = chip_stm.make_chip(parts[0])
+        chip = chip_stm.make_chip(part)
         tgcurses.wrapper(main, chip)
 
 
