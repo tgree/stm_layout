@@ -236,12 +236,14 @@ def make_chip(part):
         #   PA0
         #   PA11 [PA9]
         #   PC14-OSC32_IN (PC14)
+        #   PC14/OSC32_IN
         #   PC2_C
         #
         # The short name is the initial prefix except in the case of an "_C"
         # suffix, in which case the short name includes the suffix.  The GPIO
         # key is always strictly the prefix.
         short_name = full_name.split('-')[0]
+        short_name = short_name.split('/')[0]
         short_name = short_name.split(' ')[0]
         gpio_key   = short_name.split('_')[0]
 
