@@ -15,7 +15,8 @@ def _populate_devices(prefix=None):
     global DEVICES
     DEVICES = {}
     basedir = modm_devices.pkg.get_filename('modm_devices', 'resources/devices')
-    if prefix is None: prefix = "";
+    if prefix is None:
+        prefix = ""
     for filename in glob.glob('{}/**/{}*.xml'.format(basedir, prefix)):
         parser  = modm_devices.parser.DeviceParser()
         devfile = parser.parse(filename)
