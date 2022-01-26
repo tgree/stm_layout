@@ -280,7 +280,7 @@ def main(screen, chip):
                       add_fns_win, search_win, chip, cursor)
         elif FOCUS != FOCUS_SEARCH and c == ord('w'):
             s = chip.serialize_settings()
-            with open('/tmp/stm32_pinout.txt', 'w') as f:
+            with open('/tmp/stm32_pinout.txt', 'w', encoding='utf8') as f:
                 f.write(s)
         elif FOCUS != FOCUS_SEARCH and c == ord('r'):
             cursor.pin._reset()
