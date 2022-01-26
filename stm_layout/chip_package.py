@@ -50,7 +50,7 @@ class BGA(Package):
             self.move((0, 1))
 
     def __init__(self, width, height):
-        super(BGA, self).__init__(width, height)
+        super().__init__(width, height)
 
     def __getitem__(self, key):
         x = int(key[1:], 10) - 1
@@ -120,7 +120,7 @@ class LQFP(Package):
             self.rotate(-1)
 
     def __init__(self, width, height):
-        super(LQFP, self).__init__(width + 2, height + 2)
+        super().__init__(width + 2, height + 2)
 
     def __getitem__(self, key):
         key = int(key, 10) - 1
@@ -198,7 +198,7 @@ class TSSOP(Package):
             self.move((0, 1))
 
     def __init__(self, height):
-        super(TSSOP, self).__init__(2, height)
+        super().__init__(2, height)
 
     def __getitem__(self, key):
         key = int(key, 10) - 1
