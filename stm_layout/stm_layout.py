@@ -2,6 +2,7 @@
 import argparse
 import curses
 import curses.ascii
+import sys
 import re
 
 import tgcurses
@@ -280,7 +281,7 @@ def main(screen, chip):
                       add_fns_win, search_win, chip, cursor)
         elif FOCUS != FOCUS_SEARCH and c == ord('w'):
             s = chip.serialize_settings()
-            with open('/tmp/stm32_pinout.txt', 'w') as f:
+            with open('/tmp/stm32_pinout.txt', 'w', encoding='utf8') as f:
                 f.write(s)
         elif FOCUS != FOCUS_SEARCH and c == ord('r'):
             cursor.pin._reset()
@@ -364,13 +365,13 @@ def _main():
     parts = chip_db.find(rv.chip)
     if not parts:
         print('No devices found for "%s"' % rv.chip)
-        exit(1)
+        sys.exit(1)
     part = next( (p for p in parts if rv.chip == p.partname), None)
     if part is None:
         print('Multiple devices found for "%s"' % rv.chip)
         for p in parts:
             print('%s - %s' % (p, chip_db.package(p)))
-        exit(1)
+        sys.exit(1)
     else:
         chip = chip_stm.make_chip(part)
         tgcurses.wrapper(main, chip)

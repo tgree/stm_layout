@@ -16,7 +16,7 @@ class Choice:
 
 class Pin:
     def __init__(self, name, key, alt_fns, add_fns, full_name):
-        super(Pin, self).__init__()
+        super().__init__()
         self.name      = name
         self.full_name = full_name
         self.key       = key
@@ -30,7 +30,7 @@ class Pin:
 
 class GPIO(Pin):
     def __init__(self, name, key, alt_fns, add_fns, full_name, part):
-        super(GPIO, self).__init__(name, key, alt_fns, add_fns, full_name)
+        super().__init__(name, key, alt_fns, add_fns, full_name)
         gpio = name[:2]
         try:
             n                             = int(name[2:])
