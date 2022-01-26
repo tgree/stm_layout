@@ -14,4 +14,5 @@ disable=bad-whitespace,
         fixme,
         global-statement,
         broad-except,
-        useless-super-delegation
+        useless-super-delegation,
+        consider-using-f-string
