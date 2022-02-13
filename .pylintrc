@@ -15,4 +15,5 @@ disable=bad-whitespace,
         global-statement,
         broad-except,
         useless-super-delegation,
-        consider-using-f-string
+        consider-using-f-string,
+        R0801
