@@ -1,5 +1,5 @@
-Curses-based tool for configuring STM32 pins.
-=============================================
+Curses- and Tkinter-based tool for configuring STM32 pins.
+==========================================================
 
 This tool uses a fork of the amazing curated .xml from the modm-devices
 project.  The modm-devices project provides metadata about all STM32 devices
@@ -29,3 +29,12 @@ queries in the search bar.  In any pane but the search pane::
 The stm32_pinout.txt is an attempt to configure all the GPIO registers for
 your chip; it is woefully incomplete for anything except the H7 and G4 chips
 I have access to.
+
+Usage::
+
+    stm_layout_tk -c <chip_name>
+
+This command launches a Tkinter-based version of stm_layout that allows mouse
+navigation and a more compact display for larger MCUs.  It does not attempt to
+implement the pin-configuration "feature" that the curses-based tool does and
+is more useful as a simple reference.
