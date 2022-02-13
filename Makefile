@@ -1,5 +1,5 @@
 MODULE      := stm_layout
-MODULE_VERS := 0.1.3
+MODULE_VERS := 0.1.4
 MODULE_DEPS := \
 		setup.cfg \
 		setup.py \
