@@ -1,25 +1,22 @@
-from . import tk_workspace
+from . import tk_edgy
 from .. import chip_db
 
 
-PKG_WIDTH        = 100
-PIN_WIDTH        = 12
-PIN_LENGTH       = 20
-PIN_LABEL_OFFSET = 2
+PKG_WIDTH = 100
 
 
-class TSSOPWorkspace(tk_workspace.Workspace):
+class TSSOPWorkspace(tk_edgy.Workspace):
     def __init__(self, *args):
         super().__init__(*args)
 
         ch = self.chip.height
         w  = PKG_WIDTH
-        h  = 2*PIN_WIDTH*ch + PIN_WIDTH
+        h  = 2*self.pin_width*ch + self.pin_width
 
         pad  = 0
         for _, p in self.chip.pins.items():
             pad = max(pad, self.label_font.measure(p.name))
-        pad += PIN_LENGTH + 5 + PIN_LABEL_OFFSET
+        pad += self.pin_length + 5 + self.pin_label_offset
         self.set_geometry(50, 50, w + 2*pad + self.info_width,
                           max(h + 2*pad, self.info_height))
 
@@ -30,43 +27,20 @@ class TSSOPWorkspace(tk_workspace.Workspace):
         l0 = 1
         r0 = l0 + ch
         m = c.add_rectangle(pad, pad, w, h, fill=self.elem_fill)
-        for k, p in self.chip.pins.items():
-            i = int(k)
+        for _, p in self.chip.pins.items():
+            i = int(p.key)
             if l0 <= i < r0:
-                # Left row.
-                r = c.add_rectangle(
-                        m.x - PIN_LENGTH,
-                        m.y + PIN_WIDTH*(2*(i - l0) + 1),
-                        PIN_LENGTH, PIN_WIDTH, fill=self.elem_fill)
-                c.add_text(
-                        r.x - PIN_LABEL_OFFSET, r.y + r.height / 2,
-                        font=self.label_font, text=p.name, anchor='e')
-                c.add_text(
-                        r.x + r.width / 2 + 1, r.y + r.height / 2,
-                        font=self.pin_font, text='%u' % i, anchor='c')
-                self.pin_elems.append(r)
-
+                r = self.add_l_pin(p, m.x - self.pin_length, m.ty, m.by, i - l0)
             else:
-                # Right row.
-                r = c.add_rectangle(
-                        m.x + m.width,
-                        m.y + m.height - PIN_WIDTH*(2*(i - r0) + 2),
-                        PIN_LENGTH, PIN_WIDTH, fill=self.elem_fill)
-                c.add_text(
-                        r.x + r.width + 1 + PIN_LABEL_OFFSET,
-                        r.y + r.height / 2,
-                        font=self.label_font, text=p.name, anchor='w')
-                c.add_text(
-                        r.x + r.width / 2, r.y + r.height / 2,
-                        font=self.pin_font, text='%u' % i,
-                        anchor='c')
-                self.pin_elems.append(r)
+                r = self.add_r_pin(p, m.x + m.width, m.by, m.ty, i - r0)
 
+            self.pin_elems.append(r)
             r.pin = p
 
         package_name = chip_db.package(self.chip.part)
         c.add_text(
                 m.x + m.width / 2, m.y + m.height / 2,
                 font=self.label_font,
-                text='%s\n%s' % (self.chip.name, package_name),
+                text='%s\n%s\n%s' % (self.chip.name, package_name,
+                                     self.max_freq_mhz),
                 anchor='c')

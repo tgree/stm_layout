@@ -6,9 +6,43 @@ from stm_layout import chip_db, chip_stm, chip_package
 import stm_layout.tk
 
 
-FONT            = ('Monaco', 10)
-FONT_PIN_NUM    = ('Monaco', 9)
-FONT_INFO       = ('Monaco', 10)
+stm_layout.tk.xplat.register(
+    windows={
+        'LABEL_FONT'        : ('Courier New', 10),
+        'INFO_FONT'         : ('Courier New', 10),
+        'PIN_FONT'          : ('Courier New', 9),
+        'EDGE_PIN_H_KEY_DX' : 0,
+        'EDGE_PIN_H_KEY_DY' : 1,
+        'EDGE_PIN_V_KEY_DX' : 1,
+        'BGA_PIN_NAME_DY'   : 1,
+        'BGA_PIN_KEY_DX'    : 0,
+        'BGA_PIN_KEY_DY'    : 1,
+    },
+    darwin={
+        'LABEL_FONT'        : ('Monaco', 10),
+        'INFO_FONT'         : ('Monaco', 10),
+        'PIN_FONT'          : ('Monaco', 9),
+        'EDGE_PIN_H_KEY_DX' : 1,
+        'EDGE_PIN_H_KEY_DY' : 0,
+        'EDGE_PIN_V_KEY_DX' : 0,
+        'BGA_PIN_NAME_DY'   : 0,
+        'BGA_PIN_KEY_DX'    : 1,
+        'BGA_PIN_KEY_DY'    : 0,
+    },
+    linux={
+        # TBD.
+        'LABEL_FONT'        : ('Courier', 10),
+        'INFO_FONT'         : ('Courier', 10),
+        'PIN_FONT'          : ('Courier', 9),
+        'EDGE_PIN_H_KEY_DX' : 0,
+        'EDGE_PIN_H_KEY_DY' : 1,
+        'EDGE_PIN_V_KEY_DX' : 1,
+        'BGA_PIN_NAME_DY'   : 1,
+        'BGA_PIN_KEY_DX'    : 0,
+        'BGA_PIN_KEY_DY'    : 1,
+    },
+)
+
 RECT_FILL       = 'white'
 HILITE_FILL     = 'lightblue'
 SELECT_FILL     = 'yellow'
@@ -25,8 +59,7 @@ def main(chip, regex):
     else:
         raise Exception('Unsupported chip package.')
 
-    ws = cls(chip, FONT, FONT_PIN_NUM, FONT_INFO, RECT_FILL, HILITE_FILL,
-             SELECT_FILL, RE_FILL)
+    ws = cls(chip, RECT_FILL, HILITE_FILL, SELECT_FILL, RE_FILL)
     if regex:
         ws.set_regex(regex)
 

@@ -2,6 +2,7 @@ import re
 import tkinter.font
 
 from .tk_elems import TKBase
+from . import xplat
 
 
 class InfoText:
@@ -22,8 +23,7 @@ class InfoText:
 
 
 class Workspace(TKBase):
-    def __init__(self, chip, label_font, pin_font, info_font, elem_fill,
-                 hilite_fill, select_fill, re_fill):
+    def __init__(self, chip, elem_fill, hilite_fill, select_fill, re_fill):
         super().__init__()
 
         self.chip         = chip
@@ -37,12 +37,18 @@ class Workspace(TKBase):
         self.pin_elems    = []
         self.regex        = None
 
-        self.label_font   = tkinter.font.Font(family=label_font[0],
-                                              size=label_font[1])
-        self.pin_font     = tkinter.font.Font(family=pin_font[0],
-                                              size=pin_font[1])
-        self.info_font    = tkinter.font.Font(family=info_font[0],
-                                              size=info_font[1])
+        d = chip.part.get_driver('rcc')
+        if d and 'max-frequency' in d:
+            self.max_freq_mhz = '%.0f MHz' % (int(d['max-frequency'][-1]) / 1e6)
+        else:
+            self.max_freq_mhz = ''
+
+        self.label_font = tkinter.font.Font(family=xplat.LABEL_FONT[0],
+                                            size=xplat.LABEL_FONT[1])
+        self.pin_font   = tkinter.font.Font(family=xplat.PIN_FONT[0],
+                                            size=xplat.PIN_FONT[1])
+        self.info_font  = tkinter.font.Font(family=xplat.INFO_FONT[0],
+                                            size=xplat.INFO_FONT[1])
         dy = self.info_font.metrics('linespace')
 
         w = 300
@@ -54,7 +60,7 @@ class Workspace(TKBase):
                 w = max(w, self.info_font.measure(f))
             h = max(h, len(p.add_fns))
         self.info_width   = w + 5
-        self.info_height  = 15 + 30 + (h + 24) * dy + 15
+        self.info_height  = 15 + 30 + (h + 25) * dy + 15
         self.info_canvas  = self.add_canvas(self.info_width,
                                             self.info_height, 1, 0,
                                             sticky='nes')
@@ -73,6 +79,7 @@ class Workspace(TKBase):
         e.focus_set()
         y += 30
 
+        y += dy
         self.info_canvas.add_text(
                 15, y, font=self.info_font, text='Pin Info', anchor='nw')
         y += dy
@@ -92,16 +99,16 @@ class Workspace(TKBase):
             self.info_af_texts.append(InfoText(
                 self.info_canvas, 15, y, font=self.info_font, anchor='nw'))
 
-        max_add_fns = 0
+        self.max_add_fns = 0
         for _, p in chip.pins.items():
-            max_add_fns = max(max_add_fns, len(p.add_fns))
+            self.max_add_fns = max(self.max_add_fns, len(p.add_fns))
 
         y += 2*dy
         self.info_canvas.add_text(
                 15, y, font=self.info_font, text='Additional Functions',
                 anchor='nw')
         self.info_add_fns_texts = []
-        for _ in range(max_add_fns):
+        for _ in range(self.max_add_fns):
             y += dy
             self.info_add_fns_texts.append(InfoText(
                 self.info_canvas, 15, y, font=self.info_font, anchor='nw'))
@@ -136,24 +143,25 @@ class Workspace(TKBase):
         else:
             self.pin_pos_text.set_bg('')
 
-        for t in self.info_af_texts:
-            t.set_text('')
         for i, f in enumerate(pin_elem.pin.alt_fns):
             self.info_af_texts[i].set_text(' %2u: %s' % (i, f))
             if self.regex and self.regex.search(f):
                 self.info_af_texts[i].set_bg(self.re_fill)
             else:
                 self.info_af_texts[i].set_bg('')
+        for i in range(len(pin_elem.pin.alt_fns), 16):
+            self.info_af_texts[i].set_text('')
+            self.info_af_texts[i].set_bg('')
 
-        for t in self.info_add_fns_texts:
-            t.set_text('')
-            t.set_bg('')
         for i, f in enumerate(pin_elem.pin.add_fns):
             self.info_add_fns_texts[i].set_text(' %s' % f)
             if self.regex and self.regex.search(f):
                 self.info_add_fns_texts[i].set_bg(self.re_fill)
             else:
                 self.info_add_fns_texts[i].set_bg('')
+        for i in range(len(pin_elem.pin.add_fns), self.max_add_fns):
+            self.info_add_fns_texts[i].set_text('')
+            self.info_add_fns_texts[i].set_bg('')
 
     def color_pin(self, pin_elem):
         if self.hilited_pin == pin_elem:

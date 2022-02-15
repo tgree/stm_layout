@@ -234,10 +234,13 @@ def make_chip(part):
         # full names:
         #
         #   PA0
-        #   PA11 [PA9]
-        #   PC14-OSC32_IN (PC14)
-        #   PC14/OSC32_IN
-        #   PC2_C
+        #   PA11 [PA9]                  (stm32g050f6p6)
+        #   PC14-OSC32_IN (PC14)        (stm32u585qii3)
+        #   PC14/OSC32_IN               (stm32f767zit6)
+        #   PC14OSC32_IN                (stm32f091rch6)
+        #   PC15OSC32_OUT               (stm32f091rch6)
+        #   PF11BOOT0                   (stm32f091rch6)
+        #   PC2_C                       (stm32h745xgh6 has PC2 and PC2_C)
         #
         # The short name is the initial prefix except in the case of an "_C"
         # suffix, in which case the short name includes the suffix.  The GPIO
@@ -245,6 +248,8 @@ def make_chip(part):
         short_name = full_name.split('-')[0]
         short_name = short_name.split('/')[0]
         short_name = short_name.split(' ')[0]
+        short_name = short_name.split('OSC32_')[0]
+        short_name = short_name.split('BOOT0')[0]
         gpio_key   = short_name.split('_')[0]
 
         # Extract the alternate (digital) functions and additional (analog)
