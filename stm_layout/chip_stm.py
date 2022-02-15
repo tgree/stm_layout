@@ -234,10 +234,10 @@ def make_chip(part):
         # full names:
         #
         #   PA0
-        #   PA11 [PA9]
-        #   PC14-OSC32_IN (PC14)
-        #   PC14/OSC32_IN
-        #   PC2_C
+        #   PA11 [PA9]                  (stm32g050f6p6)
+        #   PC14-OSC32_IN (PC14)        (stm32u585qii3)
+        #   PC14/OSC32_IN               (stm32f767zit6)
+        #   PC2_C                       (stm32h745xgh6 has PC2 and PC2_C)
         #
         # The short name is the initial prefix except in the case of an "_C"
         # suffix, in which case the short name includes the suffix.  The GPIO
