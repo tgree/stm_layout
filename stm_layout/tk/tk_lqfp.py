@@ -45,7 +45,8 @@ class LQFPWorkspace(tk_edgy.Workspace):
         c.add_text(
                 m.x + m.width / 2, m.y + m.height / 2,
                 font=self.label_font,
-                text='%s\n%s' % (self.chip.name, package_name),
+                text='%s\n%s\n%s' % (self.chip.name, package_name,
+                                     self.max_freq_mhz),
                 anchor='c')
 
         if 'LQFP' not in package_name:

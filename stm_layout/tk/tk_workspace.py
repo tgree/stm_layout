@@ -37,6 +37,12 @@ class Workspace(TKBase):
         self.pin_elems    = []
         self.regex        = None
 
+        d = chip.part.get_driver('rcc')
+        if d and 'max-frequency' in d:
+            self.max_freq_mhz = '%.0f MHz' % (int(d['max-frequency'][-1]) / 1e6)
+        else:
+            self.max_freq_mhz = ''
+
         self.label_font = tkinter.font.Font(family=xplat.LABEL_FONT[0],
                                             size=xplat.LABEL_FONT[1])
         self.pin_font   = tkinter.font.Font(family=xplat.PIN_FONT[0],

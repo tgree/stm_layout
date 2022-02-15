@@ -51,5 +51,7 @@ class BGAWorkspace(tk_workspace.Workspace):
         package_name = chip_db.package(self.chip.part)
         c.add_text(m.x, m.y, font=self.label_font, text=self.chip.name,
                    anchor='sw')
+        c.add_text(m.x + m.width / 2, m.y, font=self.label_font,
+                   text=self.max_freq_mhz, anchor='s')
         c.add_text(m.rx, m.y, font=self.label_font, text=package_name,
                    anchor='se')
