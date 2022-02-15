@@ -1,4 +1,5 @@
 import tkinter
+import ctypes
 
 
 class Elem:
@@ -117,7 +118,15 @@ class Canvas:
 
 class TKBase:
     def __init__(self):
+        # Windows hack #1.
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
+        except AttributeError:
+            pass
         self._root = tkinter.Tk()
+
+        # Windows hack #2.
+        self._root.tk.call('tk', 'scaling', 1.0)
 
     def set_geometry(self, x, y, width, height):
         self._root.geometry('%ux%u+%u+%u' % (width, height, x, y))
