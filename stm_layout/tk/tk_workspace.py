@@ -54,7 +54,7 @@ class Workspace(TKBase):
                 w = max(w, self.info_font.measure(f))
             h = max(h, len(p.add_fns))
         self.info_width   = w + 5
-        self.info_height  = 15 + 30 + (h + 24) * dy + 15
+        self.info_height  = 15 + 30 + (h + 25) * dy + 15
         self.info_canvas  = self.add_canvas(self.info_width,
                                             self.info_height, 1, 0,
                                             sticky='nes')
@@ -73,6 +73,7 @@ class Workspace(TKBase):
         e.focus_set()
         y += 30
 
+        y += dy
         self.info_canvas.add_text(
                 15, y, font=self.info_font, text='Pin Info', anchor='nw')
         y += dy
