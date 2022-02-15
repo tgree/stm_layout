@@ -14,8 +14,12 @@ class CanvasElem(Elem):
         self.y       = y
         if width is not None:
             self.width = width
+            self.lx    = x
+            self.rx    = x + width
         if height is not None:
             self.height = height
+            self.ty     = y
+            self.by     = y + height
 
     def bbox(self):
         return self._canvas._bbox(self)
