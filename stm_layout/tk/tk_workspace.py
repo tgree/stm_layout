@@ -93,16 +93,16 @@ class Workspace(TKBase):
             self.info_af_texts.append(InfoText(
                 self.info_canvas, 15, y, font=self.info_font, anchor='nw'))
 
-        max_add_fns = 0
+        self.max_add_fns = 0
         for _, p in chip.pins.items():
-            max_add_fns = max(max_add_fns, len(p.add_fns))
+            self.max_add_fns = max(self.max_add_fns, len(p.add_fns))
 
         y += 2*dy
         self.info_canvas.add_text(
                 15, y, font=self.info_font, text='Additional Functions',
                 anchor='nw')
         self.info_add_fns_texts = []
-        for _ in range(max_add_fns):
+        for _ in range(self.max_add_fns):
             y += dy
             self.info_add_fns_texts.append(InfoText(
                 self.info_canvas, 15, y, font=self.info_font, anchor='nw'))
@@ -137,24 +137,25 @@ class Workspace(TKBase):
         else:
             self.pin_pos_text.set_bg('')
 
-        for t in self.info_af_texts:
-            t.set_text('')
         for i, f in enumerate(pin_elem.pin.alt_fns):
             self.info_af_texts[i].set_text(' %2u: %s' % (i, f))
             if self.regex and self.regex.search(f):
                 self.info_af_texts[i].set_bg(self.re_fill)
             else:
                 self.info_af_texts[i].set_bg('')
+        for i in range(len(pin_elem.pin.alt_fns), 16):
+            self.info_af_texts[i].set_text('')
+            self.info_af_texts[i].set_bg('')
 
-        for t in self.info_add_fns_texts:
-            t.set_text('')
-            t.set_bg('')
         for i, f in enumerate(pin_elem.pin.add_fns):
             self.info_add_fns_texts[i].set_text(' %s' % f)
             if self.regex and self.regex.search(f):
                 self.info_add_fns_texts[i].set_bg(self.re_fill)
             else:
                 self.info_add_fns_texts[i].set_bg('')
+        for i in range(len(pin_elem.pin.add_fns), self.max_add_fns):
+            self.info_add_fns_texts[i].set_text('')
+            self.info_add_fns_texts[i].set_bg('')
 
     def color_pin(self, pin_elem):
         if self.hilited_pin == pin_elem:
