@@ -1,14 +1,11 @@
 import platform
-
-
-SYSTEM = platform.system().lower()
-CONFIG = {}
+import sys
 
 
 def register(**kwargs):
-    global CONFIG
-    CONFIG = kwargs[SYSTEM]
+    module = sys.modules[__name__]
+    del module.register
 
-
-def get(key):
-    return CONFIG[key]
+    config = kwargs[platform.system().lower()]
+    for k, v in config.items():
+        setattr(module, k, v)

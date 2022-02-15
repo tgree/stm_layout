@@ -1,4 +1,5 @@
 from . import tk_workspace
+from . import xplat
 
 
 PIN_DIAM        = 30
@@ -36,9 +37,11 @@ class BGAWorkspace(tk_workspace.Workspace):
                         fill=self.elem_fill)
                 self.pin_elems.append(o)
                 c.add_text(
-                        o.x + o.width / 2, o.y + o.height,
+                        o.x + o.width / 2,
+                        o.y + o.height + xplat.BGA_PIN_NAME_DY,
                         font=self.label_font, text=p.name, anchor='n')
                 c.add_text(
-                        o.x + o.width / 2 + 1, o.y + o.height / 2,
+                        o.x + o.width / 2 + xplat.BGA_PIN_KEY_DX,
+                        o.y + o.height / 2 + xplat.BGA_PIN_KEY_DY,
                         font=self.pin_font, text=p.key, anchor='c')
                 o.pin = p

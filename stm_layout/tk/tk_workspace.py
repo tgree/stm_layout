@@ -2,6 +2,7 @@ import re
 import tkinter.font
 
 from .tk_elems import TKBase
+from . import xplat
 
 
 class InfoText:
@@ -22,8 +23,7 @@ class InfoText:
 
 
 class Workspace(TKBase):
-    def __init__(self, chip, label_font, pin_font, info_font, elem_fill,
-                 hilite_fill, select_fill, re_fill):
+    def __init__(self, chip, elem_fill, hilite_fill, select_fill, re_fill):
         super().__init__()
 
         self.chip         = chip
@@ -37,12 +37,12 @@ class Workspace(TKBase):
         self.pin_elems    = []
         self.regex        = None
 
-        self.label_font   = tkinter.font.Font(family=label_font[0],
-                                              size=label_font[1])
-        self.pin_font     = tkinter.font.Font(family=pin_font[0],
-                                              size=pin_font[1])
-        self.info_font    = tkinter.font.Font(family=info_font[0],
-                                              size=info_font[1])
+        self.label_font = tkinter.font.Font(family=xplat.LABEL_FONT[0],
+                                            size=xplat.LABEL_FONT[1])
+        self.pin_font   = tkinter.font.Font(family=xplat.PIN_FONT[0],
+                                            size=xplat.PIN_FONT[1])
+        self.info_font  = tkinter.font.Font(family=xplat.INFO_FONT[0],
+                                            size=xplat.INFO_FONT[1])
         dy = self.info_font.metrics('linespace')
 
         w = 300

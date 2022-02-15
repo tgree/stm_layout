@@ -17,3 +17,6 @@ disable=bad-whitespace,
         useless-super-delegation,
         consider-using-f-string,
         R0801
+
+[TYPECHECK]
+generated-members=xplat.*
