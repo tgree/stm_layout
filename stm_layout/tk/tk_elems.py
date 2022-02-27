@@ -58,7 +58,7 @@ class CanvasElem(Elem):
         self.y      = y
         self.width  = width
         self.height = height
-        self._canvas._move_to(self, x, y, width, height)
+        self._canvas._move_to(self, x, y, x + width, y + height)
 
 
 class TextElem(CanvasElem):
