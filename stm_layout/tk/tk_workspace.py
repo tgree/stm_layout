@@ -64,12 +64,15 @@ class Workspace(TKBase):
         self.info_canvas  = self.add_canvas(self.info_width,
                                             self.info_height, 1, 0,
                                             sticky='nes')
-        self.mcu_canvas   = None
+        self.mcu_canvas   = self._make_mcu_canvas()
+        self.mcu_canvas.register_key_pressed(self.mcu_key_pressed)
 
         sv = tkinter.StringVar()
         sv.trace_add('write', lambda n, i, m: self.set_regex(sv.get()))
         e = self.info_canvas.add_entry(font=self.label_font, width=40,
                                        textvariable=sv)
+        e._widget.configure(highlightthickness=3)
+        #print(e._widget.configure())
 
         y  = 15
         self.info_canvas.add_text(
@@ -117,6 +120,8 @@ class Workspace(TKBase):
 
         self.register_mouse_moved(self.mouse_moved)
         self.register_mouse_down(self.mouse_down)
+        #self.register_key_pressed(self.key_pressed)
+        #self.register_key_released(self.key_released)
 
     def update_info(self, pin_elem):
         if pin_elem is None:
@@ -177,6 +182,17 @@ class Workspace(TKBase):
         for pe in self.pin_elems:
             self.color_pin(pe)
 
+    def select_pin(self, pin_elem):
+        prev_selected_pin = self.selected_pin
+        self.selected_pin = pin_elem
+        if prev_selected_pin:
+            self.color_pin(prev_selected_pin)
+        if self.selected_pin:
+            self.color_pin(self.selected_pin)
+
+        self.update_info(self.selected_pin)
+        self.mcu_canvas.focus_set()
+
     def mouse_moved(self, _ws, ev, x, y):
         if ev.widget != self.mcu_canvas._canvas:
             prev_hilited_pin = self.hilited_pin
@@ -209,17 +225,8 @@ class Workspace(TKBase):
         if not self.hilited_pin:
             return
 
-        prev_selected_pin = self.selected_pin
-        if self.selected_pin == self.hilited_pin:
-            self.selected_pin = None
-        else:
-            self.selected_pin = self.hilited_pin
-        if prev_selected_pin:
-            self.color_pin(prev_selected_pin)
-        if self.selected_pin:
-            self.color_pin(self.selected_pin)
-
-        self.update_info(self.selected_pin)
+        self.select_pin(None if self.hilited_pin == self.selected_pin else
+                        self.hilited_pin)
 
     def set_regex(self, regex):
         try:
@@ -241,3 +248,24 @@ class Workspace(TKBase):
         self.color_all_pins()
         if self.selected_pin:
             self.update_info(self.selected_pin)
+
+    def tab_pressed(self, _ws, ev, _x, _y):
+        print('Tab pressed')
+
+    def shift_tab_pressed(self, _ws, ev, _x, _y):
+        print('Shift-Tab pressed')
+
+    def mcu_key_pressed(self, _ws, ev, _x, _y):
+        if not self.selected_pin:
+            return
+        if ev.keysym == 'Left':
+            self.handle_left()
+        elif ev.keysym == 'Right':
+            self.handle_right()
+        elif ev.keysym == 'Up':
+            self.handle_up()
+        elif ev.keysym == 'Down':
+            self.handle_down()
+
+    def mcu_key_released(self, _ws, ev, _x, _y):
+        print('Key Released: %s' % ev.keysym)

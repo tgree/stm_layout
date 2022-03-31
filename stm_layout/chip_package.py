@@ -7,9 +7,6 @@ class Package:
     def __init__(self, width, height):
         self.width  = width
         self.height = height
-        self.pins   = []
-        for _ in range(width):
-            self.pins.append([None]*self.height)
 
 
 class BGA(Package):
@@ -214,3 +211,6 @@ class TSSOP(Package):
 
     def cursor(self):
         return TSSOP.Cursor(self)
+
+    def left(self, p):
+        pass

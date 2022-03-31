@@ -16,10 +16,10 @@ def pin_d(t0, t1, i):
 
 class Workspace(tk_workspace.Workspace):
     def __init__(self, *args):
-        super().__init__(*args)
         self.pin_width        = PIN_WIDTH
         self.pin_length       = PIN_LENGTH
         self.pin_label_offset = PIN_LABEL_OFFSET
+        super().__init__(*args)
 
     def add_h_pin(self, p, x, y):
         c = self.mcu_canvas

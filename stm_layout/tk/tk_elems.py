@@ -95,6 +95,9 @@ class Canvas:
     def _set_text(self, elem, text):
         self._canvas.itemconfig(elem._elem_id, text=text)
 
+    def focus_set(self):
+        self._canvas.focus_set()
+
     def add_rectangle(self, x, y, width, height, **kwargs):
         elem_id = self._canvas.create_rectangle(
                 (x, y, x + width, y + height), **kwargs)
@@ -115,6 +118,15 @@ class Canvas:
     def add_entry(self, **kwargs):
         return Entry(tkinter.Entry(self._canvas, **kwargs))
 
+    def register_handler(self, event_type, handler):
+        self._canvas.bind(event_type, lambda e: handler(self, e, e.x, e.y))
+
+    def register_key_pressed(self, handler):
+        self.register_handler('<KeyPress>', handler)
+
+    def register_key_released(self, handler):
+        self.register_handler('<KeyRelease>', handler)
+
 
 class TKBase:
     def __init__(self):
@@ -134,9 +146,11 @@ class TKBase:
     def mainloop(self):
         self._root.mainloop()
 
-    def add_canvas(self, width, height, column=0, row=0, sticky=None):
-        c = tkinter.Canvas(self._root, bd=0, highlightthickness=0, width=width,
-                           height=height)
+    def add_canvas(self, width, height, column=0, row=0, sticky=None,
+                   highlightthickness=0, **kwargs):
+        c = tkinter.Canvas(self._root, bd=0,
+                           highlightthickness=highlightthickness, width=width,
+                           height=height, **kwargs)
         c.grid(column=column, row=row, sticky=sticky)
         return Canvas(c)
 
@@ -151,3 +165,15 @@ class TKBase:
 
     def register_mouse_up(self, handler):
         self.register_handler('<ButtonRelease-1>', handler)
+
+    def register_tab_pressed(self, handler):
+        self.register_handler('<Tab>', handler)
+
+    def register_shift_tab_pressed(self, handler):
+        self.register_handler('<Shift-Tab>', handler)
+
+    def register_key_pressed(self, handler):
+        self.register_handler('<KeyPress>', handler)
+
+    def register_key_released(self, handler):
+        self.register_handler('<KeyRelease>', handler)

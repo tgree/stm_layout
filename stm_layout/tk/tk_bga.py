@@ -12,6 +12,7 @@ class BGAWorkspace(tk_workspace.Workspace):
     def __init__(self, *args):
         super().__init__(*args)
 
+    def _make_mcu_canvas(self):
         dy  = self.label_font.metrics('linespace')
         cw  = self.chip.width
         ch  = self.chip.height
@@ -21,7 +22,8 @@ class BGAWorkspace(tk_workspace.Workspace):
         self.set_geometry(50, 50, w + 2*pad + self.info_width,
                           max(h + 2*pad + dy, self.info_height))
 
-        c = self.mcu_canvas = self.add_canvas(w + 2*pad, h + 2*pad + dy)
+        c = self.mcu_canvas = self.add_canvas(w + 2*pad, h + 2*pad + dy,
+                                              takefocus=1, highlightthickness=1)
         self._root.columnconfigure(0, weight=1)
         self._root.rowconfigure(0, weight=1)
 
@@ -55,3 +57,8 @@ class BGAWorkspace(tk_workspace.Workspace):
                    text=self.max_freq_mhz, anchor='s')
         c.add_text(m.rx, m.y, font=self.label_font, text=package_name,
                    anchor='se')
+
+        return c
+
+    def handle_up(self):
+        p = self.selected_pin.pin

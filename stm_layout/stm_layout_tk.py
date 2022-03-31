@@ -50,11 +50,11 @@ RE_FILL         = 'lightgreen'
 
 
 def main(chip, regex):
-    if isinstance(chip.chip, chip_package.LQFP):
+    if isinstance(chip.geometry, chip_package.LQFP):
         cls = stm_layout.tk.LQFPWorkspace
-    elif isinstance(chip.chip, chip_package.BGA):
+    elif isinstance(chip.geometry, chip_package.BGA):
         cls = stm_layout.tk.BGAWorkspace
-    elif isinstance(chip.chip, chip_package.TSSOP):
+    elif isinstance(chip.geometry, chip_package.TSSOP):
         cls = stm_layout.tk.TSSOPWorkspace
     else:
         raise Exception('Unsupported chip package.')
@@ -72,11 +72,14 @@ def _main():
     parser.add_argument('--regex')
     rv = parser.parse_args()
 
-    parts = chip_db.find(rv.chip)
+    parts = chip_db.find(rv.chip.lower())
     if not parts:
         print('No devices found for "%s"' % rv.chip)
         sys.exit(1)
-    part = next( (p for p in parts if rv.chip == p.partname), None)
+    if len(parts) == 1:
+        part = parts[0]
+    else:
+        part = next( (p for p in parts if rv.chip.lower() == p.partname), None)
     if part is None:
         print('Multiple devices found for "%s"' % rv.chip)
         for p in parts:
