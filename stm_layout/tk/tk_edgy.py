@@ -14,7 +14,7 @@ def pin_d(t0, t1, i):
     return t0 - (i + 1)*PIN_DELTA
 
 
-class Workspace(tk_workspace.Workspace):
+class Workspace(tk_workspace.Workspace):  # pylint: disable=W0223
     def __init__(self, *args):
         self.pin_width        = PIN_WIDTH
         self.pin_length       = PIN_LENGTH

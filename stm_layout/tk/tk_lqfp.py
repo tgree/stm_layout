@@ -54,16 +54,3 @@ class LQFPWorkspace(tk_edgy.Workspace):
                      w + 2*self.pin_length, h + 2*self.pin_length)
 
         return c
-
-    def handle_up(self):
-        self.select_pin(self.chip.geometry.up(self.selected_pin.pin).pin_elem)
-
-    def handle_down(self):
-        self.select_pin(self.chip.geometry.down(self.selected_pin.pin).pin_elem)
-
-    def handle_left(self):
-        self.select_pin(self.chip.geometry.left(self.selected_pin.pin).pin_elem)
-
-    def handle_right(self):
-        self.select_pin(
-            self.chip.geometry.right(self.selected_pin.pin).pin_elem)

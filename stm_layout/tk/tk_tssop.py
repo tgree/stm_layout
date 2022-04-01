@@ -1,5 +1,4 @@
 from . import tk_edgy
-from .. import chip_db
 
 
 PKG_WIDTH = 100
@@ -48,16 +47,3 @@ class TSSOPWorkspace(tk_edgy.Workspace):
                 anchor='c')
 
         return c
-
-    def handle_up(self):
-        self.select_pin(self.chip.geometry.up(self.selected_pin.pin).pin_elem)
-
-    def handle_down(self):
-        self.select_pin(self.chip.geometry.down(self.selected_pin.pin).pin_elem)
-
-    def handle_left(self):
-        self.select_pin(self.chip.geometry.left(self.selected_pin.pin).pin_elem)
-
-    def handle_right(self):
-        self.select_pin(
-            self.chip.geometry.right(self.selected_pin.pin).pin_elem)

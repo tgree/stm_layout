@@ -142,13 +142,14 @@ class BGA:
         for k, p in pins.items():
             self.pin_index[self._key_to_index(k)] = p
 
-    def _coord_to_index(self, x, y):
-        return y*self.width + x
-
-    def _key_to_coord(self, k):
+    @staticmethod
+    def _key_to_coord(k):
         x = int(k[1:], 10) - 1
         y = BGA.LABEL_TO_Y[k[0]]
         return x, y
+
+    def _coord_to_index(self, x, y):
+        return y*self.width + x
 
     def _key_to_index(self, k):
         x, y = self._key_to_coord(k)

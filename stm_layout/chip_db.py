@@ -1,11 +1,7 @@
 import glob
-import math
-import re
 
 import modm_devices.parser
 import modm_devices.pkg
-
-from . import chip_geometry
 
 
 DEVICES = None

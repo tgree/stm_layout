@@ -58,16 +58,3 @@ class BGAWorkspace(tk_workspace.Workspace):
                    text=self.chip.geometry.name, anchor='se')
 
         return c
-
-    def handle_up(self):
-        self.select_pin(self.chip.geometry.up(self.selected_pin.pin).pin_elem)
-
-    def handle_down(self):
-        self.select_pin(self.chip.geometry.down(self.selected_pin.pin).pin_elem)
-
-    def handle_left(self):
-        self.select_pin(self.chip.geometry.left(self.selected_pin.pin).pin_elem)
-
-    def handle_right(self):
-        self.select_pin(
-            self.chip.geometry.right(self.selected_pin.pin).pin_elem)
