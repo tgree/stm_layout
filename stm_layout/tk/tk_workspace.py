@@ -115,7 +115,7 @@ class Workspace(TKBase):
             self.info_add_fns_texts.append(InfoText(
                 self.info_canvas, 15, y, font=self.info_font, anchor='nw'))
 
-        self.update_info(None)
+        self.select_pin(self.pin_elems[0])
 
         self.register_mouse_moved(self.mouse_moved)
         self.register_mouse_down(self.mouse_down)
@@ -191,7 +191,6 @@ class Workspace(TKBase):
             self.color_pin(self.selected_pin)
 
         self.update_info(self.selected_pin)
-        self.mcu_canvas.focus_set()
 
     def mouse_moved(self, _ws, ev, x, y):
         if ev.widget != self.mcu_canvas._canvas:
@@ -227,6 +226,7 @@ class Workspace(TKBase):
 
         self.select_pin(None if self.hilited_pin == self.selected_pin else
                         self.hilited_pin)
+        self.mcu_canvas.focus_set()
 
     def set_regex(self, regex):
         try:

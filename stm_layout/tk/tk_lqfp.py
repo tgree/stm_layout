@@ -18,7 +18,8 @@ class LQFPWorkspace(tk_edgy.Workspace):
         self.set_geometry(50, 50, w + 2*pad + self.info_width,
                           max(h + 2*pad, self.info_height))
 
-        c = self.mcu_canvas = self.add_canvas(w + 2*pad, h + 2*pad, takefocus=1)
+        c = self.mcu_canvas = self.add_canvas(w + 2*pad, h + 2*pad, takefocus=1,
+                                              highlightthickness=1)
         self._root.columnconfigure(0, weight=1)
         self._root.rowconfigure(0, weight=1)
 
