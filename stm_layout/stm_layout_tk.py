@@ -2,7 +2,7 @@
 import argparse
 import sys
 
-from stm_layout import chip_db, chip_stm, chip_package
+from stm_layout import chip_db, chip_stm, chip_geometry
 import stm_layout.tk
 
 
@@ -50,11 +50,11 @@ RE_FILL         = 'lightgreen'
 
 
 def main(chip, regex):
-    if isinstance(chip.geometry, chip_package.LQFP):
+    if isinstance(chip.geometry, chip_geometry.LQFP):
         cls = stm_layout.tk.LQFPWorkspace
-    elif isinstance(chip.geometry, chip_package.BGA):
+    elif isinstance(chip.geometry, chip_geometry.BGA):
         cls = stm_layout.tk.BGAWorkspace
-    elif isinstance(chip.geometry, chip_package.TSSOP):
+    elif isinstance(chip.geometry, chip_geometry.TSSOP):
         cls = stm_layout.tk.TSSOPWorkspace
     else:
         raise Exception('Unsupported chip package.')

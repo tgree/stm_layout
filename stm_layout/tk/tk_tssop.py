@@ -10,7 +10,7 @@ class TSSOPWorkspace(tk_edgy.Workspace):
         super().__init__(*args)
 
     def _make_mcu_canvas(self):
-        ch = self.chip.height
+        ch = self.chip.geometry.height
         w  = PKG_WIDTH
         h  = 2*self.pin_width*ch + self.pin_width
 
@@ -40,11 +40,10 @@ class TSSOPWorkspace(tk_edgy.Workspace):
             r.pin = p
             p.pin_elem = r
 
-        package_name = chip_db.package(self.chip.part)
         c.add_text(
                 m.x + m.width / 2, m.y + m.height / 2,
                 font=self.label_font,
-                text='%s\n%s\n%s' % (self.chip.name, package_name,
+                text='%s\n%s\n%s' % (self.chip.name, self.chip.geometry.name,
                                      self.max_freq_mhz),
                 anchor='c')
 
@@ -52,33 +51,13 @@ class TSSOPWorkspace(tk_edgy.Workspace):
 
     def handle_up(self):
         self.select_pin(self.chip.geometry.up(self.selected_pin.pin).pin_elem)
-        p = self.selected_pin.pin
-        i = int(p.key) - 1
-        if i < self.chip.height:
-            i = max(0, i - 1)
-        else:
-            i = min(2*self.chip.height - 1, i + 1)
-        self.select_pin(self.pin_elems[i])
 
     def handle_down(self):
-        p = self.selected_pin.pin
-        i = int(p.key) - 1
-        if i < self.chip.height:
-            i = min(self.chip.height - 1, i + 1)
-        else:
-            i = max(self.chip.height, i - 1)
-        self.select_pin(self.pin_elems[i])
+        self.select_pin(self.chip.geometry.down(self.selected_pin.pin).pin_elem)
 
     def handle_left(self):
-        p = self.selected_pin.pin
-        i = int(p.key) - 1
-        if i >= self.chip.height:
-            i = 2*self.chip.height - i - 1
-            self.select_pin(self.pin_elems[i])
+        self.select_pin(self.chip.geometry.left(self.selected_pin.pin).pin_elem)
 
     def handle_right(self):
-        p = self.selected_pin.pin
-        i = int(p.key) - 1
-        if i < self.chip.height:
-            i = 2*self.chip.height - i - 1
-            self.select_pin(self.pin_elems[i])
+        self.select_pin(
+            self.chip.geometry.right(self.selected_pin.pin).pin_elem)

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import math
+
 from . import chip_db
 from . import chip_geometry
 
@@ -23,7 +25,7 @@ class Chip:
         self.pins     = pins
 
 
-def make_geometry(part):
+def make_geometry(part, pins):
     p = chip_db.package(part)
     n = chip_db.pin_count(part)
     if any(name in p for name in ('TFBGA', 'UFBGA', 'WLCSP', 'EWLCSP')):
@@ -33,15 +35,15 @@ def make_geometry(part):
             dim = 15    # 176+25
         else:
             dim = int(math.ceil(math.sqrt(float(n))))
-        return chip_geometry.BGA(dim, dim)
+        return chip_geometry.BGA(p, dim, dim, pins)
 
     if any(name in p for name in ('LQFP', 'UFQFPN', 'VFQFPN')):
         dim = int(math.ceil(float(n)/4.))
-        return chip_geometry.LQFP(dim, dim)
+        return chip_geometry.LQFP(p, dim, dim, pins)
 
     if any(name in p for name in ('TSSOP', 'SO8N')):
         dim = int(math.ceil(float(n)/2.))
-        return chip_geometry.TSSOP(dim, pins)
+        return chip_geometry.TSSOP(p, dim, pins)
 
     raise KeyError
 
@@ -118,7 +120,7 @@ def make_chip(part):
                 add_fns.append(f)
 
         # Assign the final pin.
-        pins[key] = Pin(short_name, key, alt_fns, add_fns, full_name, part)
+        pins[key] = Pin(short_name, key, alt_fns, add_fns, full_name)
 
     geometry = make_geometry(part, pins)
     return Chip(part, geometry, pins)

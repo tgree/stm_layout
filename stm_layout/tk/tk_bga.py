@@ -1,6 +1,5 @@
 from . import tk_workspace
 from . import xplat
-from .. import chip_db
 
 
 PIN_DIAM        = 30
@@ -14,8 +13,8 @@ class BGAWorkspace(tk_workspace.Workspace):
 
     def _make_mcu_canvas(self):
         dy  = self.label_font.metrics('linespace')
-        cw  = self.chip.width
-        ch  = self.chip.height
+        cw  = self.chip.geometry.width
+        ch  = self.chip.geometry.height
         w   = cw*PIN_DELTA + PIN_SPACE
         h   = ch*PIN_DELTA + PIN_SPACE + self.label_font.metrics('ascent')
         pad = 15
@@ -30,7 +29,7 @@ class BGAWorkspace(tk_workspace.Workspace):
         m = c.add_rectangle(pad, pad + dy, w, h, fill=self.elem_fill)
         for x in range(cw):
             for y in range(ch):
-                p = self.chip.chip.pins[x][y]
+                p = self.chip.geometry.get_pin(x, y)
                 if p is None:
                     continue
 
@@ -49,16 +48,26 @@ class BGAWorkspace(tk_workspace.Workspace):
                         o.y + o.height / 2 + xplat.BGA_PIN_KEY_DY,
                         font=self.pin_font, text=p.key, anchor='c')
                 o.pin = p
+                p.pin_elem = o
 
-        package_name = chip_db.package(self.chip.part)
         c.add_text(m.x, m.y, font=self.label_font, text=self.chip.name,
                    anchor='sw')
         c.add_text(m.x + m.width / 2, m.y, font=self.label_font,
                    text=self.max_freq_mhz, anchor='s')
-        c.add_text(m.rx, m.y, font=self.label_font, text=package_name,
-                   anchor='se')
+        c.add_text(m.rx, m.y, font=self.label_font,
+                   text=self.chip.geometry.name, anchor='se')
 
         return c
 
     def handle_up(self):
-        p = self.selected_pin.pin
+        self.select_pin(self.chip.geometry.up(self.selected_pin.pin).pin_elem)
+
+    def handle_down(self):
+        self.select_pin(self.chip.geometry.down(self.selected_pin.pin).pin_elem)
+
+    def handle_left(self):
+        self.select_pin(self.chip.geometry.left(self.selected_pin.pin).pin_elem)
+
+    def handle_right(self):
+        self.select_pin(
+            self.chip.geometry.right(self.selected_pin.pin).pin_elem)
